@@ -1,0 +1,8 @@
+.battleship-table {
+  min-width: 300px;
+  min-height: 300px;
+
+  &__cell {
+    border: 1px solid rgb(187, 187, 187);
+  }
+}

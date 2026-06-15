@@ -1,8 +1,167 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+main {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.main-ctn {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  @media (min-width: 800px) {
+    flex-direction: row;
+    justify-content: space-around;
+  }
+
+  @media (min-width: 1200px) {
+    max-width: 1000px;
+  }
+}
+
 .battleship-table {
-  min-width: 300px;
-  min-height: 300px;
+  min-width: 400px;
+  min-height: 400px;
 
   &__cell {
     border: 1px solid rgb(187, 187, 187);
   }
+
+  &__taken {
+    background: rgb(140, 187, 167);
+  }
+}
+
+.p2 .battleship-table.my-turn {
+  .battleship-table__cell {
+    &:hover {
+      outline: rgb(201, 133, 133) solid;
+    }
+  }
+}
+
+.hit {
+  position: relative;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 47%;
+    background-color: red;
+    width: 2px;
+    height: 100%;
+    border-radius: 30em;
+  }
+
+  &::before {
+    transform: rotate(45deg);
+  }
+
+  &::after {
+    transform: rotate(-45deg);
+  }
+}
+
+.miss {
+  position: relative;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 35%;
+    top: 35%;
+    background-color: rgb(71, 53, 53);
+    width: 10px;
+    height: 10px;
+    border-radius: 30em;
+  }
+}
+
+.sunk {
+  background-color: rgb(0, 0, 0);
+}
+
+#message {
+  text-align: center;
+}
+
+#currentTurn {
+  text-align: center;
+  font-size: 2em;
+}
+
+header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+}
+
+h1 {
+  align-self: start;
+}
+
+h2 {
+  padding-block: 0.5em;
+  position: relative;
+
+  &.highlight {
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      width: 17px;
+      height: 17px;
+      background-color: red;
+      border-radius: 3em;
+      border: 2px solid black;
+    }
+  }
+}
+
+#start-game {
+  width: 100px;
+  align-self: center;
+}
+
+.remove {
+  display: none;
+}
+
+.hide {
+  visibility: hidden;
+}
+
+.ctn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#scrollable-content {
+  height: 100px;
+  width: 50ch;
+  overflow-y: scroll;
+  border: 1px solid black;
+  background: lightgray;
+  padding-inline: 1em;
+  padding-block: 0.5em;
+  margin-block-start: 1em;
+}
+
+p {
+  padding: 0;
+  margin-block: 0.2em;
 }

@@ -6,19 +6,31 @@
     <title>Battleship</title>
   </head>
   <body>
-    <header></header>
+    <header>
+      <h1>Battleship</h1>
+      <p id="currentTurn">Place your ships!</p>
+      <div id="scrollable-content" tabindex="0">
+        <p>Press the "Place Ships" button to randomly place your ships. Keep pressing until you are happy with your ship placements.</p>
+      </div>
+      <button id="start-game">Start Game</button>
+    </header>
     <main>
-      <section>
-        <h2>player 1</h2>
-        <div class="battleship-ctn">
-          </table>
-        </div>
-      </section>
-      <section>
-        <h2>player 2</h2>
-        <div class="battleship-ctn">
-        </div>
-      </section>
+      <div class="main-ctn">
+        <section>
+          <div class="ctn">
+            <h2 id="you">you</h2>
+            <button id="place-ships-btn">Place Ships</button>
+          </div>
+          <div class="p1 battleship-ctn">
+            </table>
+          </div>
+        </section>
+        <section>
+          <h2 id="computer">computer</h2>
+          <div class="p2 battleship-ctn">
+          </div>
+        </section>
+      </div>
     </main>
     <footer></footer>
   </body>

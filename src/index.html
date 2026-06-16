@@ -3,35 +3,130 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
+      rel="stylesheet"
+    />
     <title>Battleship</title>
   </head>
   <body>
     <header>
       <h1>Battleship</h1>
-      <p id="currentTurn">Place your ships!</p>
       <div id="scrollable-content" tabindex="0">
-        <p>Press the "Place Ships" button to randomly place your ships. Keep pressing until you are happy with your ship placements.</p>
+        <p>
+          Press the "Place Ships" button to randomly place your ships. Keep
+          pressing until you are happy with your ship placements.
+        </p>
       </div>
       <button id="start-game">Start Game</button>
     </header>
     <main>
       <div class="main-ctn">
         <section>
-          <div class="ctn">
+          <div>
             <h2 id="you">you</h2>
-            <button id="place-ships-btn">Place Ships</button>
+            <div class="p1 battleship-ctn"></div>
           </div>
-          <div class="p1 battleship-ctn">
-            </table>
-          </div>
+          <ul class="ship-tracker">
+            <li>
+              <div>carrier</div>
+              <div class="sq-ctn">
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+              </div>
+            </li>
+            <li>
+              <div>battleship</div>
+              <div class="sq-ctn">
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+              </div>
+            </li>
+            <li>
+              <div>destroyer</div>
+              <div class="sq-ctn">
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+              </div>
+            </li>
+            <li>
+              <div>submarine</div>
+              <div class="sq-ctn">
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+              </div>
+            </li>
+            <li>
+              <div>patrol boat</div>
+              <div class="sq-ctn">
+                <span class="sq"></span>
+                <span class="sq"></span>
+              </div>
+            </li>
+          </ul>
+          <button id="place-ships-btn">Place Ships</button>
         </section>
         <section>
-          <h2 id="computer">computer</h2>
-          <div class="p2 battleship-ctn">
+          <div>
+            <h2 id="computer">cpu</h2>
+            <div class="p2 battleship-ctn"></div>
           </div>
+          <ul class="ship-tracker">
+            <li>
+              <div>carrier</div>
+              <div class="sq-ctn">
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+              </div>
+            </li>
+            <li>
+              <div>battleship</div>
+              <div class="sq-ctn">
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+              </div>
+            </li>
+            <li>
+              <div>destroyer</div>
+              <div class="sq-ctn">
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+              </div>
+            </li>
+            <li>
+              <div>submarine</div>
+              <div class="sq-ctn">
+                <span class="sq"></span>
+                <span class="sq"></span>
+                <span class="sq"></span>
+              </div>
+            </li>
+            <li>
+              <div>patrol boat</div>
+              <div class="sq-ctn">
+                <span class="sq"></span>
+                <span class="sq"></span>
+              </div>
+            </li>
+          </ul>
         </section>
       </div>
     </main>
-    <footer></footer>
+    <footer>&copy; Emma Grey</footer>
   </body>
 </html>

@@ -1,7 +1,29 @@
+$header-text: #001201;
+$body-text: #fff9d8;
+$main-blue: #3172d9;
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  display: grid;
+  color: $body-text;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  min-height: 100vh;
+  font-family: "Ubuntu", sans-serif;
+  font-weight: 300;
+  font-style: normal;
+  background: url("./assets/layered-waves-haikei.svg");
+  background-size: cover;
+}
+
+h1 {
+  color: $header-text;
 }
 
 main {
@@ -15,35 +37,35 @@ main {
   width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 2rem;
 
   @media (min-width: 800px) {
     flex-direction: row;
-    justify-content: space-around;
-  }
-
-  @media (min-width: 1200px) {
-    max-width: 1000px;
+    justify-content: center;
   }
 }
 
 .battleship-table {
-  min-width: 400px;
-  min-height: 400px;
+  width: 300px;
+  height: 300px;
+  border: 1px solid $body-text;
+  border-collapse: collapse;
 
   &__cell {
-    border: 1px solid rgb(187, 187, 187);
+    border: 1px solid $body-text;
   }
 
   &__taken {
-    background: rgb(140, 187, 167);
+    background: #3172d9;
   }
 }
 
 .p2 .battleship-table.my-turn {
   .battleship-table__cell {
     &:hover {
-      outline: rgb(201, 133, 133) solid;
+      background-color: $main-blue;
+      cursor: crosshair;
     }
   }
 }
@@ -56,9 +78,9 @@ main {
     content: "";
     position: absolute;
     top: 0;
-    left: 47%;
-    background-color: red;
-    width: 2px;
+    left: 45%;
+    background-color: $body-text;
+    width: 4px;
     height: 100%;
     border-radius: 30em;
   }
@@ -82,7 +104,7 @@ main {
     top: 0;
     left: 35%;
     top: 35%;
-    background-color: rgb(71, 53, 53);
+    background-color: $body-text;
     width: 10px;
     height: 10px;
     border-radius: 30em;
@@ -90,16 +112,11 @@ main {
 }
 
 .sunk {
-  background-color: rgb(0, 0, 0);
+  background-color: hsl(209, 52%, 25%);
 }
 
 #message {
   text-align: center;
-}
-
-#currentTurn {
-  text-align: center;
-  font-size: 2em;
 }
 
 header {
@@ -110,11 +127,11 @@ header {
 }
 
 h1 {
-  align-self: start;
+  padding-block: 0;
+  margin-block: 0.5em;
 }
 
 h2 {
-  padding-block: 0.5em;
   position: relative;
 
   &.highlight {
@@ -122,9 +139,10 @@ h2 {
       content: "";
       position: absolute;
       top: 0;
-      width: 17px;
-      height: 17px;
-      background-color: red;
+      left: -25px;
+      width: 20px;
+      height: 20px;
+      background-color: $main-blue;
       border-radius: 3em;
       border: 2px solid black;
     }
@@ -152,10 +170,11 @@ h2 {
 
 #scrollable-content {
   height: 100px;
-  width: 50ch;
+  width: 40ch;
   overflow-y: scroll;
-  border: 1px solid black;
-  background: lightgray;
+  border: 2px solid black;
+  border-radius: 0.2em;
+  background: $main-blue;
   padding-inline: 1em;
   padding-block: 0.5em;
   margin-block-start: 1em;
@@ -164,4 +183,75 @@ h2 {
 p {
   padding: 0;
   margin-block: 0.2em;
+}
+
+button {
+  background-color: $main-blue;
+  border: none;
+  font-family: inherit;
+  font-size: inherit;
+  padding-inline: 0.5em;
+  padding-block: 0.5em;
+  margin-block: 0.5em;
+  cursor: pointer;
+  box-shadow: 0 0 0 2px black;
+  border-radius: 0.2em;
+  transition:
+    border-radius 200ms,
+    background-color 200ms;
+
+  &:hover {
+    background-color: $body-text;
+    border-radius: 1em;
+  }
+}
+
+section {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 1em;
+
+  #place-ships-btn {
+    width: 100px;
+    align-self: center;
+    justify-self: center;
+  }
+
+  .ship-tracker {
+    align-self: end;
+  }
+}
+
+footer {
+  display: flex;
+  padding-block: 2em;
+  justify-content: center;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    padding-block: 0.2em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1em;
+  }
+}
+
+.sq-ctn {
+  display: flex;
+  .sq {
+    display: block;
+    width: 20px;
+    height: 20px;
+    border: 1px solid $body-text;
+
+    .hit {
+      background-color: $body-text;
+    }
+  }
 }

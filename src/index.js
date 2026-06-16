@@ -29,8 +29,6 @@ const DOMManager = (() => {
     });
   };
 
-  const currentTurnText = document.querySelector("#currentTurn");
-
   const messages = document.querySelector("#scrollable-content");
 
   const youLabel = document.querySelector("#you");
@@ -48,12 +46,10 @@ const DOMManager = (() => {
     let table = document.querySelector(".p2 .battleship-table");
 
     if (!player) {
-      currentTurnText.textContent = "GAME OVER";
+      console.log("game over.");
+      table.classList.remove("my-turn");
       return;
     }
-
-    currentTurnText.textContent =
-      player.type == "real" ? "Your turn" : "Computer's turn";
 
     youLabel.classList.remove("highlight");
     computerLabel.classList.remove("highlight");
@@ -265,7 +261,6 @@ const GameManager = (() => {
     } else {
       DOMManager.setCurrentTurn(_p2);
       stopListeningForAttack();
-      console.log("computer attack!");
       setTimeout(() => computerAttack(), 1000);
     }
   };

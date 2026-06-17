@@ -267,6 +267,7 @@ const GameManager = (() => {
         if (checkWin(_p1)) {
           // DOMManager.setMessage("COMPUTER WON.");
           _winner = "Computer";
+          endGame();
         } else {
           // computer goes again
           _playerTurn = _p2;

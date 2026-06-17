@@ -16,7 +16,10 @@
   "main": "app.js",
   "scripts": {
     "start": "webpack serve",
-    "test": "jest --verbose"
+    "build": "webpack --mode=development",
+    "test": "jest --verbose",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.29.7",

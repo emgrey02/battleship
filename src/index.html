@@ -9,30 +9,38 @@
       href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap"
       rel="stylesheet"
     />
-    <title>Battleship</title>
+    <title>battleship</title>
   </head>
   <body>
     <header>
-      <h1>Battleship</h1>
-      <div id="scrollable-content" tabindex="0">
+      <h1>battleship</h1>
+      <!-- <div id="scrollable-content" tabindex="0">
         <p>
           Press the "Place Ships" button to randomly place your ships. Keep
           pressing until you are happy with your ship placements.
         </p>
-      </div>
-      <button id="start-game">Start Game</button>
+      </div> -->
     </header>
     <main>
       <div class="main-ctn">
+        <div id="pop-up" class="remove">
+          <div id="pop-up-content">
+            <p>YOU WON!</p>
+            <button>Play Again</button>
+          </div>
+        </div>
         <section>
           <div>
-            <h2 id="you">you</h2>
+            <div class="you-ctn">
+              <h2 id="you">you</h2>
+              <button id="place-ships-btn">Place Ships</button>
+            </div>
             <div class="p1 battleship-ctn"></div>
           </div>
-          <ul class="ship-tracker">
+          <ul class="p1 ship-tracker">
             <li>
-              <div>carrier</div>
-              <div class="sq-ctn">
+              carrier
+              <div class="sq-ctn carrier">
                 <span class="sq"></span>
                 <span class="sq"></span>
                 <span class="sq"></span>
@@ -41,8 +49,8 @@
               </div>
             </li>
             <li>
-              <div>battleship</div>
-              <div class="sq-ctn">
+              battleship
+              <div class="sq-ctn battleship">
                 <span class="sq"></span>
                 <span class="sq"></span>
                 <span class="sq"></span>
@@ -50,40 +58,39 @@
               </div>
             </li>
             <li>
-              <div>destroyer</div>
-              <div class="sq-ctn">
+              destroyer
+              <div class="sq-ctn destroyer">
                 <span class="sq"></span>
                 <span class="sq"></span>
                 <span class="sq"></span>
               </div>
             </li>
             <li>
-              <div>submarine</div>
-              <div class="sq-ctn">
+              submarine
+              <div class="sq-ctn submarine">
                 <span class="sq"></span>
                 <span class="sq"></span>
                 <span class="sq"></span>
               </div>
             </li>
             <li>
-              <div>patrol boat</div>
-              <div class="sq-ctn">
+              patrol boat
+              <div class="sq-ctn patrol-boat">
                 <span class="sq"></span>
                 <span class="sq"></span>
               </div>
             </li>
           </ul>
-          <button id="place-ships-btn">Place Ships</button>
         </section>
-        <section>
+        <section id="computer-board" class="remove">
           <div>
             <h2 id="computer">cpu</h2>
             <div class="p2 battleship-ctn"></div>
           </div>
-          <ul class="ship-tracker">
+          <ul class="p2 ship-tracker">
             <li>
-              <div>carrier</div>
-              <div class="sq-ctn">
+              carrier
+              <div class="sq-ctn carrier">
                 <span class="sq"></span>
                 <span class="sq"></span>
                 <span class="sq"></span>
@@ -92,8 +99,8 @@
               </div>
             </li>
             <li>
-              <div>battleship</div>
-              <div class="sq-ctn">
+              battleship
+              <div class="sq-ctn battleship">
                 <span class="sq"></span>
                 <span class="sq"></span>
                 <span class="sq"></span>
@@ -101,24 +108,24 @@
               </div>
             </li>
             <li>
-              <div>destroyer</div>
-              <div class="sq-ctn">
+              destroyer
+              <div class="sq-ctn destroyer">
                 <span class="sq"></span>
                 <span class="sq"></span>
                 <span class="sq"></span>
               </div>
             </li>
             <li>
-              <div>submarine</div>
-              <div class="sq-ctn">
+              submarine
+              <div class="sq-ctn submarine">
                 <span class="sq"></span>
                 <span class="sq"></span>
                 <span class="sq"></span>
               </div>
             </li>
             <li>
-              <div>patrol boat</div>
-              <div class="sq-ctn">
+              patrol boat
+              <div class="sq-ctn patrol-boat">
                 <span class="sq"></span>
                 <span class="sq"></span>
               </div>
@@ -126,6 +133,7 @@
           </ul>
         </section>
       </div>
+      <button id="start-game">Start Game</button>
     </main>
     <footer>&copy; Emma Grey</footer>
   </body>

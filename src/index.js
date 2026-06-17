@@ -14,14 +14,33 @@ const DOMManager = (() => {
       table.classList.add("battleship-table");
 
       // create cells in table
-      for (let i = 0; i < 10; i++) {
+      for (let i = 0; i < 11; i++) {
         const tr = table.insertRow();
 
-        for (let j = 0; j < 10; j++) {
-          const td = tr.insertCell();
-          td.classList.add("battleship-table__cell");
-          td.dataset.x = i;
-          td.dataset.y = j;
+        for (let j = 0; j < 11; j++) {
+          // first row, create header cells
+          if (i == 0) {
+            if (j == 0) {
+              // fist row, first column, empty cell
+              const td = tr.insertCell();
+            } else {
+              const th = document.createElement("th");
+              th.scope = "col";
+              th.innerText = String.fromCharCode(`${96 + j}`);
+              tr.appendChild(th);
+            }
+          } else if (j == 0) {
+            // starting at second row
+            const th = document.createElement("th");
+            th.scope = "row";
+            th.innerText = i;
+            tr.appendChild(th);
+          } else {
+            const td = tr.insertCell();
+            td.classList.add("battleship-table__cell");
+            td.dataset.x = i - 1;
+            td.dataset.y = j - 1;
+          }
         }
       }
 
@@ -29,18 +48,15 @@ const DOMManager = (() => {
     });
   };
 
-  const messages = document.querySelector("#scrollable-content");
+  // const setMessage = (text) => {
+  //   let firstChild = messages.firstChild;
 
-  const youLabel = document.querySelector("#you");
-  const computerLabel = document.querySelector("#computer");
+  // const messages = document.querySelector("#scrollable-content");
 
-  const setMessage = (text) => {
-    let firstChild = messages.firstChild;
-
-    let newMessage = document.createElement("p");
-    newMessage.textContent = text;
-    messages.insertBefore(newMessage, firstChild);
-  };
+  //   let newMessage = document.createElement("p");
+  //   newMessage.textContent = text;
+  //   messages.insertBefore(newMessage, firstChild);
+  // };
 
   const setCurrentTurn = (player) => {
     let table = document.querySelector(".p2 .battleship-table");
@@ -50,7 +66,8 @@ const DOMManager = (() => {
       table.classList.remove("my-turn");
       return;
     }
-
+    const youLabel = document.querySelector("#you");
+    const computerLabel = document.querySelector("#computer");
     youLabel.classList.remove("highlight");
     computerLabel.classList.remove("highlight");
 
@@ -75,20 +92,23 @@ const DOMManager = (() => {
       let cell = document.querySelector(
         `.${table} [data-x="${coord.x}"][data-y="${coord.y}"]`,
       );
+
       cell.classList.add("miss");
     });
 
     // show hits
     player.gameboard.ships.forEach((ship) => {
-      ship.hits.forEach((hit) => {
+      ship.hits.forEach((hit, index) => {
         let cell = document.querySelector(
           `.${table} [data-x="${hit.x}"][data-y="${hit.y}"]`,
         );
+        let trackerCell = document.querySelector(
+          `.${table}.ship-tracker .${ship.name} .sq:nth-child(${index + 1})`,
+        );
         cell.classList.add("hit");
+        trackerCell.classList.add("hit");
       });
     });
-
-    //
   };
 
   const clearBoard = (playerType) => {
@@ -132,7 +152,7 @@ const DOMManager = (() => {
   };
 
   return {
-    setMessage,
+    // setMessage,
     setCurrentTurn,
     pregameSetup,
     showShipInTable,
@@ -145,6 +165,7 @@ const DOMManager = (() => {
 
 const GameManager = (() => {
   let _playerTurn;
+  let _winner;
 
   let _p1 = Player("real");
   let _p2 = Player("computer");
@@ -159,6 +180,17 @@ const GameManager = (() => {
   };
 
   const endGame = () => {
+    let popUp = document.querySelector("#pop-up");
+    popUp.classList.remove("remove");
+
+    let text = popUp.querySelector("p");
+    text.textContent = `${_winner} won!`;
+
+    let btn = popUp.querySelector("button");
+    btn.addEventListener("click", () => {
+      window.location.reload();
+    });
+
     DOMManager.setCurrentTurn(null);
     stopListeningForAttack();
     _playerTurn = null;
@@ -180,10 +212,12 @@ const GameManager = (() => {
     });
 
     let startBtn = document.querySelector("#start-game");
+    let computerBoard = document.querySelector("#computer-board");
     startBtn.classList.add("hide");
 
     startBtn.addEventListener("click", () => {
       psBtn.classList.add("remove");
+      computerBoard.classList.remove("remove");
       placeShipsOnBoard(_p2);
 
       // set current turn
@@ -191,9 +225,6 @@ const GameManager = (() => {
       startTurn();
 
       startBtn.classList.add("hide");
-
-      // clear message
-      DOMManager.setMessage("");
     });
   };
 
@@ -212,42 +243,43 @@ const GameManager = (() => {
     player.gameboard.ships.forEach((ship) => {
       player.gameboard.placeShip(ship);
     });
+
+    // DOMManager.assignShipTrackerCoords(player);
   };
 
   const computerAttack = async () => {
-    DOMManager.setMessage("Waiting for computer attack...");
+    // DOMManager.setMessage("Waiting for computer attack...");
     let randomCoord = {
       x: Math.floor(Math.random() * 10),
       y: Math.floor(Math.random() * 10),
     };
     if (DOMManager.isAttackValid(_p1.type, randomCoord)) {
-      setTimeout(() => {
-        if (_p1.gameboard.receiveAttack(randomCoord)) {
-          DOMManager.updateTable(_p1);
-          let ship = _p1.gameboard.board[randomCoord.x][randomCoord.y];
-          DOMManager.setMessage(`Computer hit your ${ship.name}!`);
+      if (_p1.gameboard.receiveAttack(randomCoord)) {
+        DOMManager.updateTable(_p1);
+        let ship = _p1.gameboard.board[randomCoord.x][randomCoord.y];
+        // DOMManager.setMessage(`Computer hit your ${ship.name}!`);
 
-          if (ship.isSunk()) {
-            DOMManager.setMessage(`Computer has sunk your ${ship.name}!`);
-            DOMManager.sinkShip(_p1.type, ship);
-          }
+        if (ship.isSunk()) {
+          // DOMManager.setMessage(`Computer has sunk your ${ship.name}!`);
+          DOMManager.sinkShip(_p1.type, ship);
+        }
 
-          if (checkWin(_p1)) {
-            DOMManager.setMessage("COMPUTER WON.");
-          } else {
-            // computer goes again
-            _playerTurn = _p2;
-            startTurn();
-          }
+        if (checkWin(_p1)) {
+          // DOMManager.setMessage("COMPUTER WON.");
+          _winner = "Computer";
         } else {
-          DOMManager.setMessage("Computer missed!");
-          DOMManager.updateTable(_p1);
-          _playerTurn = _p1;
+          // computer goes again
+          _playerTurn = _p2;
           startTurn();
         }
-      }, 1000);
+      } else {
+        // DOMManager.setMessage("Computer missed!");
+        DOMManager.updateTable(_p1);
+        _playerTurn = _p1;
+        startTurn();
+      }
     } else {
-      DOMManager.setMessage("Computer made an invalid attack");
+      // DOMManager.setMessage("Computer made an invalid attack");
 
       // tell computer to go again
       computerAttack();
@@ -261,7 +293,7 @@ const GameManager = (() => {
     } else {
       DOMManager.setCurrentTurn(_p2);
       stopListeningForAttack();
-      setTimeout(() => computerAttack(), 1000);
+      setTimeout(() => computerAttack(), 500);
     }
   };
 
@@ -271,15 +303,16 @@ const GameManager = (() => {
 
     if (DOMManager.isAttackValid(_p2.type, coords)) {
       if (_p2.gameboard.receiveAttack(coords)) {
-        DOMManager.setMessage("You hit a ship!");
+        // DOMManager.setMessage("You hit a ship!");
         DOMManager.updateTable(_p2);
         let ship = _p2.gameboard.board[coords.x][coords.y];
         if (ship.isSunk()) {
-          DOMManager.setMessage(`You've sunk your opponent's ${ship.name}`);
+          // DOMManager.setMessage(`You've sunk your opponent's ${ship.name}`);
           DOMManager.sinkShip(_p2.type, ship);
         }
         if (checkWin(_p2)) {
-          DOMManager.setMessage("YOU WON.");
+          // DOMManager.setMessage("YOU WON.");
+          _winner = "You";
           endGame();
         } else {
           // computer goes again
@@ -287,18 +320,15 @@ const GameManager = (() => {
           startTurn();
         }
       } else {
-        DOMManager.setMessage("You missed!");
+        // DOMManager.setMessage("You missed!");
         DOMManager.updateTable(_p2);
         _playerTurn = _p2;
         startTurn();
       }
-    } else {
-      DOMManager.setMessage("You made an invalid attack");
     }
   };
 
   const listenForAttack = () => {
-    console.log("listening for attack");
     const cells = document.querySelectorAll(`.p2 .battleship-table__cell`);
     cells.forEach((cell) => {
       cell.addEventListener("click", playerAttack);
@@ -306,7 +336,6 @@ const GameManager = (() => {
   };
 
   const stopListeningForAttack = () => {
-    console.log("stop listening for attack");
     const cells = document.querySelectorAll(`.p2 .battleship-table__cell`);
     cells.forEach((cell) => {
       cell.removeEventListener("click", playerAttack);

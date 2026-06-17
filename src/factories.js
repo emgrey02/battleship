@@ -45,7 +45,7 @@ export const Gameboard = () => {
     Ship(4, "battleship"),
     Ship(3, "destroyer"),
     Ship(3, "submarine"),
-    Ship(2, "patrol boat"),
+    Ship(2, "patrol-boat"),
   ];
 
   const eraseBoard = () => {

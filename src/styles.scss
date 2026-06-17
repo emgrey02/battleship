@@ -1,6 +1,13 @@
 $header-text: #001201;
-$body-text: #fff9d8;
-$main-blue: #3172d9;
+$table-outline: #97968e;
+$body-text: #faf7e0;
+$main-blue: #09669c;
+$second-blue: #97968e;
+$purple: #54317c;
+$bkgd: #001220;
+
+// #3e8aad
+// #1456c0
 
 *,
 *::before,
@@ -13,17 +20,15 @@ body {
   display: grid;
   color: $body-text;
   grid-template-rows: auto 1fr auto;
+  align-items: center;
   height: 100%;
   min-height: 100vh;
   font-family: "Ubuntu", sans-serif;
   font-weight: 300;
   font-style: normal;
   background: url("./assets/layered-waves-haikei.svg");
+  background-color: $bkgd;
   background-size: cover;
-}
-
-h1 {
-  color: $header-text;
 }
 
 main {
@@ -36,11 +41,11 @@ main {
 .main-ctn {
   width: 100%;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   align-items: center;
   gap: 2rem;
 
-  @media (min-width: 800px) {
+  @media (min-width: 1000px) {
     flex-direction: row;
     justify-content: center;
   }
@@ -49,15 +54,82 @@ main {
 .battleship-table {
   width: 300px;
   height: 300px;
-  border: 1px solid $body-text;
+
+  @media (min-width: 600px) {
+    width: 400px;
+    height: 400px;
+  }
+
+  @media (min-width: 1000px) {
+    width: 350px;
+    height: 350px;
+  }
+
+  @media (min-width: 1200px) {
+    width: 450px;
+    height: 450px;
+  }
+  // border: 1px solid $table-outline;
   border-collapse: collapse;
 
+  th {
+    margin: 0;
+    padding: 0;
+    width: 20px;
+    color: $table-outline;
+  }
+
   &__cell {
-    border: 1px solid $body-text;
+    border: 1px solid $table-outline;
+
+    &.hit {
+      position: relative;
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 45%;
+        background-color: $body-text;
+        width: 3px;
+        height: 100%;
+        border-radius: 30em;
+      }
+
+      &::before {
+        transform: rotate(45deg);
+      }
+
+      &::after {
+        transform: rotate(-45deg);
+      }
+    }
+
+    &.miss {
+      position: relative;
+
+      &::before,
+      &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 35%;
+        top: 35%;
+        background-color: $table-outline;
+        width: 10px;
+        height: 10px;
+        border-radius: 30em;
+      }
+    }
+
+    &.sunk {
+      background-color: $purple;
+    }
   }
 
   &__taken {
-    background: #3172d9;
+    background: $main-blue;
   }
 }
 
@@ -68,51 +140,6 @@ main {
       cursor: crosshair;
     }
   }
-}
-
-.hit {
-  position: relative;
-
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 45%;
-    background-color: $body-text;
-    width: 4px;
-    height: 100%;
-    border-radius: 30em;
-  }
-
-  &::before {
-    transform: rotate(45deg);
-  }
-
-  &::after {
-    transform: rotate(-45deg);
-  }
-}
-
-.miss {
-  position: relative;
-
-  &::before,
-  &::after {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 35%;
-    top: 35%;
-    background-color: $body-text;
-    width: 10px;
-    height: 10px;
-    border-radius: 30em;
-  }
-}
-
-.sunk {
-  background-color: hsl(209, 52%, 25%);
 }
 
 #message {
@@ -128,21 +155,23 @@ header {
 
 h1 {
   padding-block: 0;
-  margin-block: 0.5em;
+  margin-block: 1em;
+  font-weight: 300;
 }
 
 h2 {
   position: relative;
+  padding-inline-start: 1.5em;
 
   &.highlight {
     &::after {
       content: "";
       position: absolute;
-      top: 0;
-      left: -25px;
+      top: -10px;
+      left: 80px;
       width: 20px;
       height: 20px;
-      background-color: $main-blue;
+      background-color: $body-text;
       border-radius: 3em;
       border: 2px solid black;
     }
@@ -150,6 +179,7 @@ h2 {
 }
 
 #start-game {
+  margin-block: 2em;
   width: 100px;
   align-self: center;
 }
@@ -168,17 +198,17 @@ h2 {
   justify-content: space-between;
 }
 
-#scrollable-content {
-  height: 100px;
-  width: 40ch;
-  overflow-y: scroll;
-  border: 2px solid black;
-  border-radius: 0.2em;
-  background: $main-blue;
-  padding-inline: 1em;
-  padding-block: 0.5em;
-  margin-block-start: 1em;
-}
+// #scrollable-content {
+//   height: 100px;
+//   width: 40ch;
+//   overflow-y: scroll;
+//   border: 2px solid black;
+//   border-radius: 0.2em;
+//   background: $main-blue;
+//   padding-inline: 1em;
+//   padding-block: 0.5em;
+//   margin-block-start: 1em;
+// }
 
 p {
   padding: 0;
@@ -186,7 +216,8 @@ p {
 }
 
 button {
-  background-color: $main-blue;
+  background-color: $purple;
+  color: $body-text;
   border: none;
   font-family: inherit;
   font-size: inherit;
@@ -201,16 +232,34 @@ button {
     background-color 200ms;
 
   &:hover {
-    background-color: $body-text;
+    background-color: $main-blue;
     border-radius: 1em;
   }
+
+  &:active {
+    background-color: $header-text;
+  }
+
+  &:focus {
+    outline: 2px solid $body-text;
+  }
+}
+
+.you-ctn {
+  display: flex;
+  justify-content: space-between;
 }
 
 section {
   position: relative;
-  display: grid;
-  grid-template-columns: auto 1fr;
+  display: flex;
+  flex-direction: column;
   gap: 1em;
+
+  @media (min-width: 600px) {
+    flex-direction: row;
+    gap: 1em;
+  }
 
   #place-ships-btn {
     width: 100px;
@@ -219,7 +268,17 @@ section {
   }
 
   .ship-tracker {
+    display: flex;
+    gap: 0.7em;
+    flex-wrap: wrap;
+    width: 250px;
     align-self: end;
+
+    @media (min-width: 600px) {
+      flex-direction: column;
+      gap: 0;
+      width: min-content;
+    }
   }
 }
 
@@ -239,19 +298,59 @@ ul {
     display: flex;
     flex-direction: column;
     gap: 0.1em;
+
+    .sq-ctn {
+      display: flex;
+
+      .sq {
+        display: block;
+        width: 20px;
+        height: 20px;
+        border: 1px solid $table-outline;
+      }
+    }
   }
 }
 
-.sq-ctn {
-  display: flex;
-  .sq {
-    display: block;
-    width: 20px;
-    height: 20px;
-    border: 1px solid $body-text;
+.p1 .sq {
+  &.hit {
+    background-color: $main-blue;
+  }
+}
 
-    .hit {
-      background-color: $body-text;
-    }
+.p2 .sq {
+  &.hit {
+    background-color: $purple;
+  }
+}
+
+// pop up when someone wins
+#pop-up {
+  position: absolute;
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.925);
+  z-index: 2;
+
+  &.remove {
+    display: none;
+  }
+
+  > #pop-up-content {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    width: 300px;
+    height: 200px;
+    border-radius: 0.2em;
+    background-color: $bkgd;
+    font-size: 1.2em;
+    text-align: center;
+    border: 2px solid $main-blue;
   }
 }

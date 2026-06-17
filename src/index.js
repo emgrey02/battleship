@@ -40,6 +40,13 @@ const DOMManager = (() => {
             td.classList.add("battleship-table__cell");
             td.dataset.x = i - 1;
             td.dataset.y = j - 1;
+
+            // add accessibility roles
+            td.setAttribute("role", "gridcell");
+            td.setAttribute(
+              "aria-label",
+              `Cell ${String.fromCharCode(96 + j)}${i}`,
+            );
           }
         }
       }
@@ -57,6 +64,15 @@ const DOMManager = (() => {
   //   newMessage.textContent = text;
   //   messages.insertBefore(newMessage, firstChild);
   // };
+
+  const setTabIndexes = () => {
+    let cpuTable = document.querySelectorAll(
+      ".p2 table .battleship-table__cell",
+    );
+    cpuTable.forEach((cell) => {
+      cell.tabIndex = 0;
+    });
+  };
 
   const setCurrentTurn = (player) => {
     let table = document.querySelector(".p2 .battleship-table");
@@ -82,6 +98,7 @@ const DOMManager = (() => {
 
   const pregameSetup = () => {
     createTables();
+    setTabIndexes();
   };
 
   const updateTable = (player) => {
@@ -299,32 +316,37 @@ const GameManager = (() => {
   };
 
   const playerAttack = (e) => {
-    // get coords
-    let coords = { x: +e.target.dataset.x, y: +e.target.dataset.y };
+    if (
+      event.type === "click" ||
+      (event.type === "keydown" && event.key === "Enter")
+    ) {
+      // get coords
+      let coords = { x: +e.target.dataset.x, y: +e.target.dataset.y };
 
-    if (DOMManager.isAttackValid(_p2.type, coords)) {
-      if (_p2.gameboard.receiveAttack(coords)) {
-        // DOMManager.setMessage("You hit a ship!");
-        DOMManager.updateTable(_p2);
-        let ship = _p2.gameboard.board[coords.x][coords.y];
-        if (ship.isSunk()) {
-          // DOMManager.setMessage(`You've sunk your opponent's ${ship.name}`);
-          DOMManager.sinkShip(_p2.type, ship);
-        }
-        if (checkWin(_p2)) {
-          // DOMManager.setMessage("YOU WON.");
-          _winner = "You";
-          endGame();
+      if (DOMManager.isAttackValid(_p2.type, coords)) {
+        if (_p2.gameboard.receiveAttack(coords)) {
+          // DOMManager.setMessage("You hit a ship!");
+          DOMManager.updateTable(_p2);
+          let ship = _p2.gameboard.board[coords.x][coords.y];
+          if (ship.isSunk()) {
+            // DOMManager.setMessage(`You've sunk your opponent's ${ship.name}`);
+            DOMManager.sinkShip(_p2.type, ship);
+          }
+          if (checkWin(_p2)) {
+            // DOMManager.setMessage("YOU WON.");
+            _winner = "You";
+            endGame();
+          } else {
+            // computer goes again
+            _playerTurn = _p1;
+            startTurn();
+          }
         } else {
-          // computer goes again
-          _playerTurn = _p1;
+          // DOMManager.setMessage("You missed!");
+          DOMManager.updateTable(_p2);
+          _playerTurn = _p2;
           startTurn();
         }
-      } else {
-        // DOMManager.setMessage("You missed!");
-        DOMManager.updateTable(_p2);
-        _playerTurn = _p2;
-        startTurn();
       }
     }
   };
@@ -333,6 +355,7 @@ const GameManager = (() => {
     const cells = document.querySelectorAll(`.p2 .battleship-table__cell`);
     cells.forEach((cell) => {
       cell.addEventListener("click", playerAttack);
+      cell.addEventListener("keydown", playerAttack);
     });
   };
 
@@ -340,6 +363,7 @@ const GameManager = (() => {
     const cells = document.querySelectorAll(`.p2 .battleship-table__cell`);
     cells.forEach((cell) => {
       cell.removeEventListener("click", playerAttack);
+      cell.removeEventListener("keydown", playerAttack);
     });
   };
 

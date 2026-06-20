@@ -1,5 +1,7 @@
 import "./styles.scss";
-import { Player, Gameboard, Ship } from "./factories.js";
+import { Player } from "./models/player.js";
+import { Ship } from "./models/ship.js";
+import { Gameboard } from "./models/gameboard.js";
 
 /**
  * Manages the DOM, there's only one so its a IIFE
@@ -54,16 +56,6 @@ const DOMManager = (() => {
       c.appendChild(table);
     });
   };
-
-  // const setMessage = (text) => {
-  //   let firstChild = messages.firstChild;
-
-  // const messages = document.querySelector("#scrollable-content");
-
-  //   let newMessage = document.createElement("p");
-  //   newMessage.textContent = text;
-  //   messages.insertBefore(newMessage, firstChild);
-  // };
 
   const setTabIndexes = () => {
     let cpuTable = document.querySelectorAll(
@@ -157,19 +149,49 @@ const DOMManager = (() => {
   };
 
   const isAttackValid = (playerType, coord) => {
+    console.log("checking if attack is valid");
+    console.log(playerType);
+    console.log(coord);
     let table = playerType == "real" ? "p1" : "p2";
     const cell = document.querySelector(
       `.${table} [data-x="${coord.x}"][data-y="${coord.y}"]`,
     );
     if (cell.classList.contains("miss") || cell.classList.contains("hit")) {
+      console.log("invalid hit");
       return false;
     } else {
+      console.log("valid hit");
       return true;
     }
   };
 
+  const listenForAttack = (handler) => {
+    const cells = document.querySelectorAll(`.p2 .battleship-table__cell`);
+    cells.forEach((cell) => {
+      cell.addEventListener("click", (e) => handler(e));
+      cell.addEventListener("keydown", (e) => handler(e));
+    });
+  };
+
+  const stopListeningForAttack = (handler) => {
+    const cells = document.querySelectorAll(`.p2 .battleship-table__cell`);
+    cells.forEach((cell) => {
+      cell.removeEventListener("click", handler);
+      cell.removeEventListener("keydown", handler);
+    });
+  };
+
+  const showRealPlayerBoard = (player) => {
+    player.gameboard.board.forEach((row) => {
+      row.forEach((cell) => {
+        if (cell != null) {
+          showShipInTable("real", cell.location);
+        }
+      });
+    });
+  };
+
   return {
-    // setMessage,
     setCurrentTurn,
     pregameSetup,
     showShipInTable,
@@ -177,41 +199,36 @@ const DOMManager = (() => {
     sinkShip,
     isAttackValid,
     clearBoard,
+    listenForAttack,
+    stopListeningForAttack,
+    showRealPlayerBoard,
   };
 })();
 
 const GameManager = (() => {
+  let _p1turnCount = 0;
+  let _p2turnCount = 0;
+
   let _playerTurn;
   let _winner;
 
   let _p1 = Player("real");
   let _p2 = Player("computer");
 
-  // check if player's board has all sunken ships
-  const checkWin = (player) => {
-    return player.gameboard.checkSunkShips();
+  const computerAttack = (coords, res) => {
+    return {
+      coords,
+      res,
+    };
   };
 
-  const eraseBoard = (player) => {
-    player.gameboard.eraseBoard();
-  };
+  let cpuAttackHistory = [];
 
-  const endGame = () => {
-    let popUp = document.querySelector("#pop-up");
-    popUp.classList.remove("remove");
-
-    let text = popUp.querySelector("p");
-    text.textContent = `${_winner} won!`;
-
-    let btn = popUp.querySelector("button");
-    btn.addEventListener("click", () => {
-      window.location.reload();
-    });
-
-    DOMManager.setCurrentTurn(null);
-    stopListeningForAttack();
-    _playerTurn = null;
-  };
+  let searchingForNextHit = false;
+  let lastHit;
+  let foundNextHit = false;
+  let hitArray = [];
+  let justSunkOne = false;
 
   const startGame = () => {
     DOMManager.pregameSetup();
@@ -223,7 +240,7 @@ const GameManager = (() => {
       DOMManager.clearBoard(_p1.type);
 
       placeShipsOnBoard(_p1);
-      showRealPlayerBoard();
+      DOMManager.showRealPlayerBoard(_p1);
 
       startBtn.classList.remove("hide");
     });
@@ -245,77 +262,25 @@ const GameManager = (() => {
     });
   };
 
-  const showRealPlayerBoard = () => {
-    _p1.gameboard.board.forEach((row) => {
-      row.forEach((cell) => {
-        if (cell != null) {
-          DOMManager.showShipInTable("real", cell.location);
-        }
-      });
-    });
-  };
-
   const placeShipsOnBoard = (player) => {
     // place ships
     player.gameboard.ships.forEach((ship) => {
       player.gameboard.placeShip(ship);
     });
-
-    // DOMManager.assignShipTrackerCoords(player);
-  };
-
-  const computerAttack = async () => {
-    // DOMManager.setMessage("Waiting for computer attack...");
-    let randomCoord = {
-      x: Math.floor(Math.random() * 10),
-      y: Math.floor(Math.random() * 10),
-    };
-    if (DOMManager.isAttackValid(_p1.type, randomCoord)) {
-      if (_p1.gameboard.receiveAttack(randomCoord)) {
-        DOMManager.updateTable(_p1);
-        let ship = _p1.gameboard.board[randomCoord.x][randomCoord.y];
-        // DOMManager.setMessage(`Computer hit your ${ship.name}!`);
-
-        if (ship.isSunk()) {
-          // DOMManager.setMessage(`Computer has sunk your ${ship.name}!`);
-          DOMManager.sinkShip(_p1.type, ship);
-        }
-
-        if (checkWin(_p1)) {
-          // DOMManager.setMessage("COMPUTER WON.");
-          _winner = "Computer";
-          endGame();
-        } else {
-          // computer goes again
-          _playerTurn = _p2;
-          startTurn();
-        }
-      } else {
-        // DOMManager.setMessage("Computer missed!");
-        DOMManager.updateTable(_p1);
-        _playerTurn = _p1;
-        startTurn();
-      }
-    } else {
-      // DOMManager.setMessage("Computer made an invalid attack");
-
-      // tell computer to go again
-      computerAttack();
-    }
   };
 
   const startTurn = async () => {
     if (_playerTurn == _p1) {
       DOMManager.setCurrentTurn(_p1);
-      listenForAttack();
+      DOMManager.listenForAttack(startPlayerAttack);
     } else {
       DOMManager.setCurrentTurn(_p2);
-      stopListeningForAttack();
-      setTimeout(() => computerAttack(), 500);
+      DOMManager.stopListeningForAttack(startPlayerAttack);
+      setTimeout(() => startComputerAttack(), 500);
     }
   };
 
-  const playerAttack = (e) => {
+  const startPlayerAttack = (e) => {
     if (
       event.type === "click" ||
       (event.type === "keydown" && event.key === "Enter")
@@ -323,26 +288,25 @@ const GameManager = (() => {
       // get coords
       let coords = { x: +e.target.dataset.x, y: +e.target.dataset.y };
 
+      // make sure cell hasn't been hit or missed already
       if (DOMManager.isAttackValid(_p2.type, coords)) {
+        _p1turnCount++;
         if (_p2.gameboard.receiveAttack(coords)) {
-          // DOMManager.setMessage("You hit a ship!");
           DOMManager.updateTable(_p2);
           let ship = _p2.gameboard.board[coords.x][coords.y];
           if (ship.isSunk()) {
-            // DOMManager.setMessage(`You've sunk your opponent's ${ship.name}`);
             DOMManager.sinkShip(_p2.type, ship);
           }
           if (checkWin(_p2)) {
-            // DOMManager.setMessage("YOU WON.");
-            _winner = "You";
+            _winner = _p1;
             endGame();
           } else {
-            // computer goes again
+            // player goes again
             _playerTurn = _p1;
             startTurn();
           }
         } else {
-          // DOMManager.setMessage("You missed!");
+          // missed
           DOMManager.updateTable(_p2);
           _playerTurn = _p2;
           startTurn();
@@ -351,20 +315,257 @@ const GameManager = (() => {
     }
   };
 
-  const listenForAttack = () => {
-    const cells = document.querySelectorAll(`.p2 .battleship-table__cell`);
-    cells.forEach((cell) => {
-      cell.addEventListener("click", playerAttack);
-      cell.addEventListener("keydown", playerAttack);
+  const getValidAdjacentCoords = (coord) => {
+    console.log("getting valid adj coords");
+    console.log(`current coord: ${[coord.x, coord.y]}`);
+    let validCoords = [];
+    if (coord.x > 0) {
+      // check above
+      let upCoord = { x: coord.x - 1, y: coord.y };
+      let aboveRes = DOMManager.isAttackValid("real", upCoord);
+      if (aboveRes) validCoords.push(upCoord);
+    }
+
+    if (coord.y > 0) {
+      // check left
+      let leftCoord = { x: coord.x, y: coord.y - 1 };
+      let leftRes = DOMManager.isAttackValid("real", leftCoord);
+      if (leftRes) validCoords.push(leftCoord);
+    }
+
+    if (coord.x < 9) {
+      // check bottom
+      let downCoord = { x: coord.x + 1, y: coord.y };
+      let downCoordRes = DOMManager.isAttackValid("real", downCoord);
+      if (downCoordRes) validCoords.push(downCoord);
+    }
+
+    if (coord.y < 9) {
+      // check right
+      let rightCoord = { x: coord.x, y: coord.y + 1 };
+      let rightRes = DOMManager.isAttackValid("real", rightCoord);
+      if (rightRes) validCoords.push(rightCoord);
+    }
+
+    console.log("returning valid coords");
+    validCoords.forEach((c) => {
+      console.log(`${c.x}, ${c.y}`);
     });
+    return validCoords;
   };
 
-  const stopListeningForAttack = () => {
-    const cells = document.querySelectorAll(`.p2 .battleship-table__cell`);
-    cells.forEach((cell) => {
-      cell.removeEventListener("click", playerAttack);
-      cell.removeEventListener("keydown", playerAttack);
+  const getShipAxis = (hitArray) => {
+    // get the direction the ship is going based on two coordinates
+    let xCoord = hitArray[0].x;
+    let yCoord = hitArray[0].y;
+
+    console.log("x-direction: ");
+    let xDirection = hitArray.every((val, index) => {
+      // x is the same
+      console.log(`${index}: comparing ${val.x} and ${xCoord}`);
+      return val.x == xCoord;
     });
+
+    console.log("y-direction: ");
+    let yDirection = hitArray.every((val, index) => {
+      // y is the same
+      console.log(`${index}: comparing ${val.y} and ${yCoord}`);
+      return val.y == yCoord;
+    });
+
+    return yDirection ? "yAxis" : "xAxis";
+  };
+
+  const getCoordBasedOnAxis = (axis, coordsArray) => {
+    let options = [];
+    if (axis === "xAxis") {
+      coordsArray.forEach((coords) => {
+        if (coords.y > 0) {
+          let c = { x: coords.x, y: coords.y - 1 };
+          DOMManager.isAttackValid("real", c) && options.push(c);
+        }
+
+        if (coords.y < 9) {
+          let c = { x: coords.x, y: coords.y + 1 };
+          DOMManager.isAttackValid("real", c) && options.push(c);
+        }
+      });
+    } else {
+      coordsArray.forEach((coords) => {
+        if (coords.x > 0) {
+          let c = { x: coords.x - 1, y: coords.y };
+          DOMManager.isAttackValid("real", c) && options.push(c);
+        }
+
+        if (coords.x < 9) {
+          let c = { x: coords.x + 1, y: coords.y };
+          DOMManager.isAttackValid("real", c) && options.push(c);
+        }
+      });
+    }
+
+    options.forEach((coord) => {
+      console.log(`option: ${coord.x}, ${coord.y}`);
+    });
+
+    let index = Math.floor(Math.random() * options.length);
+    console.log(`index : ${index}`);
+    return options[index];
+  };
+
+  const startComputerAttack = async () => {
+    let attackCoord;
+
+    let lastAttack = cpuAttackHistory
+      ? cpuAttackHistory[cpuAttackHistory.length - 1]
+      : false;
+
+    // computer is working on sinking a ship
+    if ((lastAttack && lastAttack.res) || searchingForNextHit || foundNextHit) {
+      // last attack was a hit, or we are searching bc we recently had a hit, or we just hit again
+      // time to search
+
+      // computer hit a ship for the first time
+      if (lastAttack.res && !foundNextHit) {
+        console.log("last attack was a hit");
+        searchingForNextHit = true;
+        let adjacentCoords = getValidAdjacentCoords(
+          hitArray[hitArray.length - 1],
+        );
+        attackCoord =
+          adjacentCoords[Math.floor(Math.random() * adjacentCoords.length)];
+        console.log("coord: " + attackCoord.x + " , " + attackCoord.y);
+      } else if (foundNextHit && hitArray.length > 0) {
+        let axis = getShipAxis(hitArray);
+        console.log("axis: " + axis);
+        attackCoord = getCoordBasedOnAxis(axis, hitArray);
+        console.log([attackCoord.x, attackCoord.y]);
+      } else {
+        console.log("still searching, coordinate set to adjacent cell");
+        let adjacentCoords = getValidAdjacentCoords(
+          hitArray[hitArray.length - 1],
+        );
+        attackCoord =
+          adjacentCoords[Math.floor(Math.random() * adjacentCoords.length)];
+        console.log("coord: " + attackCoord.x + " , " + attackCoord.y);
+      }
+
+      // attack an adjacent coordinate
+    } else {
+      // random coordinate
+      console.log("attacking random coordinate");
+      attackCoord = {
+        x: Math.floor(Math.random() * 10),
+        y: Math.floor(Math.random() * 10),
+      };
+    }
+
+    console.log("seeing if computer attack is valid");
+    console.log([attackCoord.x, attackCoord.y]);
+    if (DOMManager.isAttackValid(_p1.type, attackCoord)) {
+      _p2turnCount++;
+
+      if (_p1.gameboard.receiveAttack(attackCoord)) {
+        // its a hit
+        if (searchingForNextHit) {
+          console.log("found a hit after searching");
+          foundNextHit = true;
+        }
+
+        hitArray.push(attackCoord);
+
+        DOMManager.updateTable(_p1);
+        let ship = _p1.gameboard.board[attackCoord.x][attackCoord.y];
+
+        // add to cpu attack array as a hit
+        let newAttack = computerAttack(attackCoord, true);
+        cpuAttackHistory.push(newAttack);
+
+        if (ship.isSunk()) {
+          DOMManager.sinkShip(_p1.type, ship);
+          // clear hit array, and stop searching for next hit: go back to random
+          hitArray = [];
+          searchingForNextHit = false;
+          foundNextHit = false;
+          let fauxAttack = computerAttack({ x: 0, y: 0 }, false);
+          cpuAttackHistory.push(fauxAttack);
+        }
+
+        if (checkWin(_p1)) {
+          // computer won the game
+          _winner = _p2;
+          endGame();
+        } else {
+          // computer goes again
+          _playerTurn = _p2;
+          startTurn();
+        }
+      } else {
+        console.log("computer missed");
+        // its a miss, turn over
+        DOMManager.updateTable(_p1);
+        _playerTurn = _p1;
+
+        // add to cpu attack array as a miss
+        let newAttack = computerAttack(attackCoord, false);
+        cpuAttackHistory.push(newAttack);
+
+        startTurn();
+      }
+    } else {
+      // tell computer to go again
+      startComputerAttack();
+    }
+  };
+  // check if player's board has all sunken ships
+  const checkWin = (player) => {
+    return player.gameboard.checkSunkShips();
+  };
+
+  const eraseBoard = (player) => {
+    player.gameboard.eraseBoard();
+  };
+
+  const endGame = () => {
+    let popUp = document.querySelector("#pop-up");
+    popUp.classList.remove("remove");
+
+    let winText = popUp.querySelector("p:first-child");
+    winText.textContent = `${_winner.type == "real" ? "YOU WON!" : "YOU LOST :("}`;
+
+    // let winnerHits = 17;
+    // let winnerMisses = _winner.gameboard.missedShots.length;
+
+    // let loserHits =
+    //   _winner.type == "real"
+    //     ? _p2turnCount - _p2.gameboard.missedShots.length
+    //     : _p1turnCount - _p1.gameboard.missedShots.length;
+    // let loserMisses =
+    //   _winner.type == "real"
+    //     ? _p1.gameboard.missedShots.length
+    //     : _p2.gameboard.missedShots.length;
+
+    // let winnerInfo = document.querySelector("#winner-info");
+
+    // let loserInfo = document.querySelector("#loser-info");
+
+    // let winnerTurnText = winnerInfo.querySelector("p:first-child");
+
+    // winnerTurnText.textContent = `${Math.round(winnerHits / winnerMisses + winnerHits)}% accuracy`;
+
+    // let loserTurnText = loserInfo.querySelector("p:first-child");
+
+    // loserTurnText.textContent = `${Math.round(loserHits / loserMisses + loserHits)}% accuracy`;
+
+    let btn = popUp.querySelector("button");
+    btn.focus();
+    btn.addEventListener("click", () => {
+      window.location.reload();
+    });
+
+    DOMManager.setCurrentTurn(null);
+    DOMManager.stopListeningForAttack(startPlayerAttack);
+    _playerTurn = null;
   };
 
   return {

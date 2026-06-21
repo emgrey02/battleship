@@ -74,16 +74,20 @@ const DOMManager = (() => {
       table.classList.remove("my-turn");
       return;
     }
-    const youLabel = document.querySelector("#you");
-    const computerLabel = document.querySelector("#computer");
-    youLabel.classList.remove("highlight");
-    computerLabel.classList.remove("highlight");
+
+    const playerTable = document.querySelector("#player-board");
+    const cpuTable = document.querySelector("#computer-board");
+
+    // const youLabel = document.querySelector("#you");
+    // const computerLabel = document.querySelector("#computer");
+    playerTable.classList.remove("highlight");
+    cpuTable.classList.remove("highlight");
 
     if (player.type == "real") {
-      youLabel.classList.add("highlight");
+      cpuTable.classList.add("highlight");
       table.classList.add("my-turn");
     } else {
-      computerLabel.classList.add("highlight");
+      playerTable.classList.add("highlight");
       table.classList.remove("my-turn");
     }
   };
@@ -318,8 +322,6 @@ const GameManager = (() => {
   };
 
   const getValidAdjacentCoords = (coord) => {
-    console.log("getting valid adj coords");
-    console.log(`current coord: ${[coord.x, coord.y]}`);
     let validCoords = [];
     if (coord.x > 0) {
       // check above
@@ -348,11 +350,6 @@ const GameManager = (() => {
       let rightRes = DOMManager.isAttackValid("real", rightCoord);
       if (rightRes) validCoords.push(rightCoord);
     }
-
-    console.log("returning valid coords");
-    validCoords.forEach((c) => {
-      console.log(`${c.x}, ${c.y}`);
-    });
     return validCoords;
   };
 
@@ -361,17 +358,13 @@ const GameManager = (() => {
     let xCoord = hitArray[0].x;
     let yCoord = hitArray[0].y;
 
-    console.log("x-direction: ");
     let xDirection = hitArray.every((val, index) => {
       // x is the same
-      console.log(`${index}: comparing ${val.x} and ${xCoord}`);
       return val.x == xCoord;
     });
 
-    console.log("y-direction: ");
     let yDirection = hitArray.every((val, index) => {
       // y is the same
-      console.log(`${index}: comparing ${val.y} and ${yCoord}`);
       return val.y == yCoord;
     });
 
@@ -406,12 +399,7 @@ const GameManager = (() => {
       });
     }
 
-    options.forEach((coord) => {
-      console.log(`option: ${coord.x}, ${coord.y}`);
-    });
-
     let index = Math.floor(Math.random() * options.length);
-    console.log(`index : ${index}`);
     return options[index];
   };
 
@@ -429,51 +417,46 @@ const GameManager = (() => {
 
       // computer hit a ship for the first time
       if (lastAttack.res && !foundNextHit) {
-        console.log("last attack was a hit");
+        // last attack was a hit
         searchingForNextHit = true;
         let adjacentCoords = getValidAdjacentCoords(
           hitArray[hitArray.length - 1],
         );
         attackCoord =
           adjacentCoords[Math.floor(Math.random() * adjacentCoords.length)];
-        console.log("coord: " + attackCoord.x + " , " + attackCoord.y);
       } else if (foundNextHit && hitArray.length > 0) {
+        // we hit a ship more than once
         let axis = getShipAxis(hitArray);
-        console.log("axis: " + axis);
         attackCoord = getCoordBasedOnAxis(axis, hitArray);
-        console.log([attackCoord.x, attackCoord.y]);
       } else {
-        console.log("still searching, coordinate set to adjacent cell");
+        // we recently had a hit but haven't hit a ship twice yet
         let adjacentCoords = getValidAdjacentCoords(
           hitArray[hitArray.length - 1],
         );
         attackCoord =
           adjacentCoords[Math.floor(Math.random() * adjacentCoords.length)];
-        console.log("coord: " + attackCoord.x + " , " + attackCoord.y);
       }
-
-      // attack an adjacent coordinate
     } else {
       // random coordinate
-      console.log("attacking random coordinate");
       attackCoord = {
         x: Math.floor(Math.random() * 10),
         y: Math.floor(Math.random() * 10),
       };
     }
 
-    console.log("seeing if computer attack is valid");
-    console.log([attackCoord.x, attackCoord.y]);
     if (DOMManager.isAttackValid(_p1.type, attackCoord)) {
+      // attack hits a cell we haven't hit yet
       _p2turnCount++;
 
       if (_p1.gameboard.receiveAttack(attackCoord)) {
         // its a hit
+
         if (searchingForNextHit) {
-          console.log("found a hit after searching");
+          // found a second hit!
           foundNextHit = true;
         }
 
+        // add to hit array
         hitArray.push(attackCoord);
 
         DOMManager.updateTable(_p1);
@@ -503,7 +486,6 @@ const GameManager = (() => {
           startTurn();
         }
       } else {
-        console.log("computer missed");
         // its a miss, turn over
         DOMManager.updateTable(_p1);
         _playerTurn = _p1;

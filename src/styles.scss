@@ -90,8 +90,8 @@ main {
       &::after {
         content: "";
         position: absolute;
+        left: 43%;
         top: 0;
-        left: 45%;
         background-color: $body-text;
         width: 3px;
         height: 100%;
@@ -114,9 +114,9 @@ main {
       &::after {
         content: "";
         position: absolute;
-        top: 0;
-        left: 35%;
-        top: 35%;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
         background-color: $table-outline;
         width: 10px;
         height: 10px;

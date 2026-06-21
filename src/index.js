@@ -247,7 +247,7 @@ const GameManager = (() => {
 
     let startBtn = document.querySelector("#start-game");
     let computerBoard = document.querySelector("#computer-board");
-    let playerBoard = document.querySelector(".p1 .battleship-table");
+    let playerBoard = document.querySelector("#player-board");
     startBtn.classList.add("remove");
 
     startBtn.addEventListener("click", () => {

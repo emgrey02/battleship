@@ -134,9 +134,20 @@ main {
   }
 }
 
-.p1 .battleship-table {
+#player-board.small {
   @media (max-width: 500px) {
-    &.small {
+    flex-direction: row;
+
+    .ship-tracker {
+      height: 100%;
+      flex-direction: column;
+      gap: 0;
+      font-size: 0.8em;
+      width: 100px;
+    }
+  }
+  .p1 .battleship-table {
+    @media (max-width: 500px) {
       width: 150px;
       height: 150px;
 
@@ -282,20 +293,6 @@ section {
       flex-direction: column;
       gap: 0;
       width: min-content;
-    }
-  }
-}
-
-#player-board {
-  @media (max-width: 500px) {
-    flex-direction: row;
-
-    .ship-tracker {
-      height: 100%;
-      flex-direction: column;
-      gap: 0;
-      font-size: 0.8em;
-      width: 100px;
     }
   }
 }

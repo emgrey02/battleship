@@ -242,23 +242,25 @@ const GameManager = (() => {
       placeShipsOnBoard(_p1);
       DOMManager.showRealPlayerBoard(_p1);
 
-      startBtn.classList.remove("hide");
+      startBtn.classList.remove("remove");
     });
 
     let startBtn = document.querySelector("#start-game");
     let computerBoard = document.querySelector("#computer-board");
-    startBtn.classList.add("hide");
+    let playerBoard = document.querySelector(".p1 .battleship-table");
+    startBtn.classList.add("remove");
 
     startBtn.addEventListener("click", () => {
       psBtn.classList.add("remove");
       computerBoard.classList.remove("remove");
+      playerBoard.classList.add("small");
       placeShipsOnBoard(_p2);
 
       // set current turn
       _playerTurn = _p1;
       startTurn();
 
-      startBtn.classList.add("hide");
+      startBtn.classList.add("remove");
     });
   };
 

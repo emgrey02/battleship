@@ -6,9 +6,6 @@ $second-blue: #97968e;
 $purple: #54317c;
 $bkgd: #001220;
 
-// #3e8aad
-// #1456c0
-
 *,
 *::before,
 *::after {
@@ -41,7 +38,7 @@ main {
 .main-ctn {
   width: 100%;
   display: flex;
-  flex-direction: column-reverse;
+  flex-direction: column;
   align-items: center;
   gap: 2rem;
 
@@ -52,8 +49,8 @@ main {
 }
 
 .battleship-table {
-  width: 300px;
-  height: 300px;
+  width: 350px;
+  height: 350px;
 
   @media (min-width: 600px) {
     width: 400px;
@@ -137,6 +134,19 @@ main {
   }
 }
 
+.p1 .battleship-table {
+  @media (max-width: 500px) {
+    &.small {
+      width: 150px;
+      height: 150px;
+
+      th {
+        font-size: 0.8em;
+      }
+    }
+  }
+}
+
 .p2 .battleship-table.my-turn {
   .battleship-table__cell {
     &:hover {
@@ -166,6 +176,8 @@ h1 {
 h2 {
   position: relative;
   padding-inline-start: 1.5em;
+  margin: 0;
+  margin-block-end: 0.2em;
 
   &.highlight {
     &::after {
@@ -201,18 +213,6 @@ h2 {
   align-items: center;
   justify-content: space-between;
 }
-
-// #scrollable-content {
-//   height: 100px;
-//   width: 40ch;
-//   overflow-y: scroll;
-//   border: 2px solid black;
-//   border-radius: 0.2em;
-//   background: $main-blue;
-//   padding-inline: 1em;
-//   padding-block: 0.5em;
-//   margin-block-start: 1em;
-// }
 
 p {
   padding: 0;
@@ -275,13 +275,27 @@ section {
     display: flex;
     gap: 0.7em;
     flex-wrap: wrap;
-    width: 250px;
+    width: 300px;
     align-self: end;
 
     @media (min-width: 600px) {
       flex-direction: column;
       gap: 0;
       width: min-content;
+    }
+  }
+}
+
+#player-board {
+  @media (max-width: 500px) {
+    flex-direction: row;
+
+    .ship-tracker {
+      height: 100%;
+      flex-direction: column;
+      gap: 0;
+      font-size: 0.8em;
+      width: 100px;
     }
   }
 }
@@ -298,7 +312,7 @@ ul {
   margin: 0;
 
   li {
-    padding-block: 0.2em;
+    padding: 0;
     display: flex;
     flex-direction: column;
     gap: 0.1em;

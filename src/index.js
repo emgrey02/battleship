@@ -8,6 +8,9 @@ import { Gameboard } from "./models/gameboard.js";
  * @returns {any}
  */
 const DOMManager = (() => {
+  let shipNum = 0;
+  let resetShipPlacementHandler = null;
+
   const createTables = () => {
     const ctn = document.querySelectorAll(".battleship-ctn");
 
@@ -78,8 +81,6 @@ const DOMManager = (() => {
     const playerTable = document.querySelector("#player-board");
     const cpuTable = document.querySelector("#computer-board");
 
-    // const youLabel = document.querySelector("#you");
-    // const computerLabel = document.querySelector("#computer");
     playerTable.classList.remove("highlight");
     cpuTable.classList.remove("highlight");
 
@@ -95,6 +96,199 @@ const DOMManager = (() => {
   const pregameSetup = () => {
     createTables();
     setTabIndexes();
+  };
+
+  const setUpPregameListeners = async (
+    randomizeHandler,
+    manualPlacementHandler,
+    startGameHandler,
+  ) => {
+    let pregameInstructions = document.querySelector("#pregame-instructions");
+    let instructions = document.querySelector("#instructions");
+
+    let random = document.querySelector("#random");
+    let manual = document.querySelector("#manual");
+
+    let randomBtns = document.querySelector("#random-btns");
+    let manualBtns = document.querySelector("#manual-btns");
+
+    let randomizeBtn = document.querySelector("#randomize-btn");
+
+    let startBtn = document.querySelector("#start-game");
+
+    let computerBoard = document.querySelector("#computer-board");
+    let playerBoard = document.querySelector("#player-board");
+
+    let nextShipBtn = document.querySelector("#next-ship-btn");
+
+    startBtn.classList.add("hide");
+    nextShipBtn.disabled = true;
+
+    if (random.checked) {
+      instructions.textContent =
+        "keep randomizing until you are satisfied with your ship placements.";
+      randomBtns.classList.remove("remove");
+      manualBtns.classList.add("remove");
+    } else {
+      instructions.textContent =
+        "click and drag the highlighted ship to your board.";
+      randomBtns.classList.add("remove");
+      manualBtns.classList.remove("remove");
+      manualPlacementHandler(shipNum);
+    }
+
+    random.addEventListener("change", (e) => {
+      if (random.checked) {
+        instructions.textContent =
+          "keep randomizing until you are satisfied with your ship placements.";
+        randomBtns.classList.remove("remove");
+        manualBtns.classList.add("remove");
+        removeShipHighlights();
+        changeToXAxis();
+      }
+    });
+
+    randomizeBtn.addEventListener("click", (e) => {
+      randomizeHandler();
+      showStartBtn();
+    });
+
+    manual.addEventListener("change", () => {
+      if (manual.checked) {
+        randomBtns.classList.add("remove");
+        manualBtns.classList.remove("remove");
+        startBtn.classList.add("hide");
+        instructions.textContent =
+          "click and drag the highlighted ship to your board.";
+        shipNum = 0;
+        nextShipBtn.disabled = true;
+        manualPlacementHandler(shipNum);
+      }
+    });
+
+    nextShipBtn.addEventListener("click", (e) => {
+      shipNum++;
+      if (shipNum < 4) {
+        manualPlacementHandler(shipNum);
+      } else {
+        manualPlacementHandler(shipNum);
+      }
+      nextShipBtn.disabled = true;
+    });
+
+    startBtn.addEventListener("click", () => {
+      randomizeBtn.classList.add("remove");
+      computerBoard.classList.remove("remove");
+      playerBoard.classList.add("small");
+      startBtn.classList.add("remove");
+      pregameInstructions.classList.add("remove");
+
+      removeShipHighlights();
+
+      startGameHandler();
+    });
+  };
+
+  const highlightShip = (ship) => {
+    let allShips = document.querySelectorAll(`.p1.ship-tracker .sq-ctn`);
+    allShips.forEach((shipCtn) => {
+      shipCtn.classList.remove("draggable");
+      shipCtn.draggable = false;
+    });
+    let currentShip = document.querySelector(
+      `.p1.ship-tracker .sq-ctn.${ship.name}`,
+    );
+    currentShip.classList.add("draggable");
+    currentShip.draggable = true;
+  };
+
+  const removeShipHighlights = () => {
+    // make sure highlight is off
+    let ships = document.querySelectorAll(`.p1.ship-tracker .sq-ctn`);
+    ships.forEach((shipCell) => {
+      shipCell.classList.remove("draggable");
+      shipCell.draggable = false;
+    });
+  };
+
+  const removeDragoverHighlight = (cellArray) => {
+    cellArray.forEach((coord) => {
+      let cell = document.querySelector(
+        `.p1 [data-x="${coord.x}"][data-y="${coord.y}"]`,
+      );
+      cell.classList.remove("dragover");
+    });
+  };
+
+  const onDragOver = (handler) => {
+    let dropTarget = document.querySelector(`.p1 .battleship-table`);
+    dropTarget.id = "drop-target";
+    dropTarget.addEventListener("dragover", handler);
+  };
+
+  const onDragLeave = (handler) => {
+    let dropTarget = document.querySelector(`.p1 .battleship-table`);
+    dropTarget.addEventListener("dragleave", handler);
+  };
+
+  const onDrop = (handler) => {
+    let dropTarget = document.querySelector(`.p1 .battleship-table`);
+    dropTarget.addEventListener("drop", handler);
+  };
+
+  const removeDragEventListeners = (handler1, handler2, handler3) => {
+    let dropTarget = document.querySelector(`.p1 .battleship-table`);
+    dropTarget.removeEventListener("dragover", handler1);
+    dropTarget.removeEventListener("dragleave", handler2);
+    dropTarget.removeEventListener("drop", handler3);
+  };
+
+  const removeResetShipListener = (handler) => {
+    let resetBtn = document.querySelector("#reset-btn");
+    resetBtn.removeEventListener("click", handler);
+  };
+
+  const changeToXAxis = () => {
+    let draggableShips = document.querySelectorAll(`.p1.ship-tracker .sq-ctn`);
+    draggableShips.forEach((ship) => {
+      ship.classList.remove("vertical");
+    });
+  };
+
+  const onChangeAxis = (handler) => {
+    let axisBtn = document.querySelector("#axis-btn");
+    axisBtn.addEventListener("click", () => {
+      console.log("axis btn clicked");
+      let draggableShips = document.querySelectorAll(
+        `.p1.ship-tracker .sq-ctn`,
+      );
+      draggableShips.forEach((ship) => {
+        console.log(ship.classList);
+        console.log("toggling");
+        ship.classList.toggle("vertical");
+      });
+      handler();
+    });
+  };
+
+  const onResetShipPlacement = (handler) => {
+    let resetBtn = document.querySelector("#reset-btn");
+    // remove previous listener
+    if (resetShipPlacementHandler) {
+      resetBtn.removeEventListener("click", resetShipPlacementHandler);
+    }
+    // set new listener
+    resetShipPlacementHandler = handler;
+    resetBtn.disabled = true;
+    resetBtn.addEventListener("click", resetShipPlacementHandler);
+  };
+
+  const removeResetShipPlacement = () => {
+    let resetBtn = document.querySelector("#reset-btn");
+    if (resetShipPlacementHandler) {
+      resetBtn.removeEventListener("click", resetShipPlacementHandler);
+      resetShipPlacementHandler = null;
+    }
   };
 
   const updateTable = (player) => {
@@ -124,12 +318,13 @@ const DOMManager = (() => {
     });
   };
 
-  const clearBoard = (playerType) => {
-    let table = playerType == "real" ? "p1" : "p2";
+  const clearBoard = (player) => {
+    let table = player.type == "real" ? "p1" : "p2";
     const cells = document.querySelectorAll(`.${table} [data-x][data-y]`);
     cells.forEach((cell) => {
       cell.classList = "battleship-table__cell";
     });
+    console.log(player.gameboard.board);
   };
 
   const showShipInTable = (playerType, coordArr) => {
@@ -187,17 +382,30 @@ const DOMManager = (() => {
 
   const showRealPlayerBoard = (player) => {
     player.gameboard.board.forEach((row) => {
+      console.log(row);
       row.forEach((cell) => {
-        if (cell != null) {
+        if (cell !== null) {
+          console.log("show ship in table");
           showShipInTable("real", cell.location);
         }
       });
     });
   };
 
+  const showStartBtn = () => {
+    let startBtn = document.querySelector("#start-game");
+    startBtn.classList.remove("hide");
+  };
+
+  const hideStartBtn = () => {
+    let startBtn = document.querySelector("#start-game");
+    startBtn.classList.add("hide");
+  };
+
   return {
     setCurrentTurn,
     pregameSetup,
+    setUpPregameListeners,
     showShipInTable,
     updateTable,
     sinkShip,
@@ -206,6 +414,19 @@ const DOMManager = (() => {
     listenForAttack,
     stopListeningForAttack,
     showRealPlayerBoard,
+    highlightShip,
+    onDragOver,
+    onDragLeave,
+    onDrop,
+    removeDragEventListeners,
+    showStartBtn,
+    hideStartBtn,
+    removeDragoverHighlight,
+    onChangeAxis,
+    onResetShipPlacement,
+    removeResetShipListener,
+    changeToXAxis,
+    removeShipHighlights,
   };
 })();
 
@@ -232,47 +453,179 @@ const GameManager = (() => {
   let lastHit;
   let foundNextHit = false;
   let hitArray = [];
-  let justSunkOne = false;
+  let axis = "x";
 
   const startGame = () => {
     DOMManager.pregameSetup();
+    DOMManager.setUpPregameListeners(
+      onRandomizeBtnClicked,
+      onManualPlacement,
+      onStartBtnClicked,
+    );
 
-    let psBtn = document.querySelector("#place-ships-btn");
-
-    psBtn.addEventListener("click", () => {
-      eraseBoard(_p1);
-      DOMManager.clearBoard(_p1.type);
-
-      placeShipsOnBoard(_p1);
-      DOMManager.showRealPlayerBoard(_p1);
-
-      startBtn.classList.remove("remove");
-    });
-
-    let startBtn = document.querySelector("#start-game");
-    let computerBoard = document.querySelector("#computer-board");
-    let playerBoard = document.querySelector("#player-board");
-    startBtn.classList.add("remove");
-
-    startBtn.addEventListener("click", () => {
-      psBtn.classList.add("remove");
-      computerBoard.classList.remove("remove");
-      playerBoard.classList.add("small");
-      placeShipsOnBoard(_p2);
-
-      // set current turn
-      _playerTurn = _p1;
-      startTurn();
-
-      startBtn.classList.add("remove");
-    });
+    DOMManager.onChangeAxis(switchAxis);
   };
 
-  const placeShipsOnBoard = (player) => {
+  const switchAxis = () => {
+    if (axis === "x") {
+      axis = "y";
+    } else {
+      axis = "x";
+    }
+  };
+
+  const onManualPlacement = (shipNum) => {
+    let currentShip = _p1.gameboard.ships[shipNum];
+
+    if (shipNum == 0) {
+      eraseBoard(_p1);
+    }
+
+    const dragoverEventHandler = (e) => {
+      let cellLoc = {
+        x: +`${e.target.dataset.x}`,
+        y: +`${e.target.dataset.y}`,
+      };
+      let shipLength = currentShip.length;
+      let cellArray = [];
+      for (let i = 0; i < shipLength; i++) {
+        if (axis === "x") {
+          cellArray.push({ x: cellLoc.x, y: cellLoc.y + i });
+        } else {
+          cellArray.push({ x: cellLoc.x + i, y: cellLoc.y });
+        }
+      }
+      if (_p1.gameboard.checkCoords(cellArray)) {
+        cellArray.forEach((coord) => {
+          let cell = document.querySelector(
+            `.p1 [data-x="${coord.x}"][data-y="${coord.y}"]`,
+          );
+          cell.classList.add("dragover");
+        });
+      }
+      e.preventDefault();
+    };
+
+    const dragLeaveEventHandler = (e) => {
+      let cellLoc = {
+        x: +`${e.target.dataset.x}`,
+        y: +`${e.target.dataset.y}`,
+      };
+      let shipLength = currentShip.length;
+      let cellArray = [];
+      for (let i = 0; i < shipLength; i++) {
+        if (axis === "x") {
+          cellArray.push({ x: cellLoc.x, y: cellLoc.y + i });
+        } else {
+          cellArray.push({ x: cellLoc.x + i, y: cellLoc.y });
+        }
+      }
+      if (_p1.gameboard.checkCoords(cellArray)) {
+        cellArray.forEach((coord) => {
+          let cell = document.querySelector(
+            `.p1 [data-x="${coord.x}"][data-y="${coord.y}"]`,
+          );
+          cell.classList.remove("dragover");
+        });
+      }
+    };
+
+    const dropEventHandler = (e) => {
+      let cellLoc = {
+        x: +`${e.target.dataset.x}`,
+        y: +`${e.target.dataset.y}`,
+      };
+      let shipLength = currentShip.length;
+      let cellArray = [];
+      for (let i = 0; i < shipLength; i++) {
+        if (axis === "x") {
+          cellArray.push({ x: cellLoc.x, y: cellLoc.y + i });
+        } else {
+          cellArray.push({ x: cellLoc.x + i, y: cellLoc.y });
+        }
+      }
+
+      let nextShipBtn = document.querySelector("#next-ship-btn");
+      let resetBtn = document.querySelector("#reset-btn");
+
+      if (_p1.gameboard.checkCoords(cellArray)) {
+        console.log("placing ship");
+        _p1.gameboard.placeShip(currentShip, cellArray);
+        DOMManager.removeDragoverHighlight(cellArray);
+        DOMManager.showShipInTable("real", cellArray);
+        nextShipBtn.disabled = false;
+        resetBtn.disabled = false;
+        if (shipLength == 2) {
+          DOMManager.showStartBtn();
+          nextShipBtn.disabled = true;
+        }
+        DOMManager.removeDragEventListeners(
+          dragoverEventHandler,
+          dragLeaveEventHandler,
+          dropEventHandler,
+        );
+      }
+    };
+
+    const resetShip = () => {
+      _p1.gameboard.removeShip(currentShip);
+      DOMManager.clearBoard(_p1);
+      DOMManager.showRealPlayerBoard(_p1);
+
+      // remove start game button if reset button was pressed when placing patrol boat (the last boat)
+      if (currentShip.length == 2) {
+        DOMManager.hideStartBtn();
+      }
+
+      // disable placenextship btn
+      let nextShipBtn = document.querySelector("#next-ship-btn");
+      nextShipBtn.disabled = true;
+
+      let resetBtn = document.querySelector("#reset-btn");
+      resetBtn.disabled = true;
+
+      // reattach event listeners
+      DOMManager.onDragOver(dragoverEventHandler);
+      DOMManager.onDragLeave(dragLeaveEventHandler);
+      DOMManager.onDrop(dropEventHandler);
+    };
+
+    DOMManager.highlightShip(currentShip);
+    DOMManager.onDragOver(dragoverEventHandler);
+    DOMManager.onDragLeave(dragLeaveEventHandler);
+    DOMManager.onDrop(dropEventHandler);
+    DOMManager.onResetShipPlacement(resetShip);
+  };
+
+  const onRandomizeBtnClicked = () => {
+    eraseBoard(_p1);
+    placeShipsOnBoardRandomly(_p1);
+  };
+
+  const onStartBtnClicked = () => {
+    // randomly place cpu ships
+    placeShipsOnBoardRandomly(_p2);
+    // set current turn
+    _playerTurn = _p1;
+    startTurn();
+
+    if (axis === "y") {
+      switchAxis();
+      DOMManager.changeToXAxis();
+    }
+  };
+
+  const placeShipsOnBoardRandomly = (player) => {
     // place ships
     player.gameboard.ships.forEach((ship) => {
       player.gameboard.placeShip(ship);
     });
+
+    // update ui if it's player's board
+    if (player.type === "real") {
+      console.log("showing real player board");
+      DOMManager.showRealPlayerBoard(_p1);
+    }
   };
 
   const startTurn = async () => {
@@ -508,6 +861,7 @@ const GameManager = (() => {
 
   const eraseBoard = (player) => {
     player.gameboard.eraseBoard();
+    DOMManager.clearBoard(player);
   };
 
   const endGame = () => {

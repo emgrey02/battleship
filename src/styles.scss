@@ -49,6 +49,64 @@ main {
   }
 }
 
+#pregame-instructions {
+  text-align: center;
+  background-color: $main-blue;
+  border-radius: 1em;
+  padding-block: 1em;
+  padding-inline: 0.5em;
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+
+  @media (min-width: 600px) {
+    flex-direction: row;
+  }
+
+  &.remove {
+    display: none;
+  }
+
+  > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 250px;
+    gap: 0.5em;
+
+    &.remove {
+      display: none;
+    }
+  }
+
+  .radio-ctn {
+    display: flex;
+    width: 100%;
+
+    label {
+      display: relative;
+      cursor: pointer;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+    }
+
+    input {
+      appearance: none;
+
+      + span.radio-text {
+        display: block;
+        padding-inline: 1em;
+        padding-block: 0.2em;
+      }
+
+      &:checked + span {
+        background-color: black;
+      }
+    }
+  }
+}
+
 .battleship-table {
   width: 350px;
   height: 350px;
@@ -79,6 +137,10 @@ main {
 
   &__cell {
     border: 1px solid $table-outline;
+
+    &.dragover {
+      background-color: white;
+    }
 
     &:focus {
       outline: 3px solid #ffcc00;
@@ -193,20 +255,6 @@ h2 {
   position: relative;
   padding-inline-start: 0.5em;
   margin: 0;
-
-  // &.highlight {
-  //   &::after {
-  //     content: "";
-  //     position: absolute;
-  //     top: -10px;
-  //     left: 130px;
-  //     width: 20px;
-  //     height: 20px;
-  //     background-color: $body-text;
-  //     border-radius: 3em;
-  //     border: 2px solid black;
-  //   }
-  // }
 }
 
 // start game button
@@ -263,11 +311,20 @@ button {
   &:focus {
     outline: 2px solid $body-text;
   }
+
+  &:disabled {
+    background-color: grey;
+    cursor: auto;
+    &:hover {
+      background-color: grey;
+      border-radius: 0.2em;
+    }
+  }
 }
 
 .you-ctn {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
 }
 
 #player-board,
@@ -276,11 +333,19 @@ button {
   padding-block: 0.5em;
 
   &.highlight {
-    // background-color: black;
-    outline: 1px solid $table-outline;
+    background-color: black;
   }
 }
 
+#player-board.highlight {
+  outline: 2px solid $main-blue;
+}
+
+#computer-board.highlight {
+  outline: 2px solid $purple;
+}
+
+// ship trackers
 section {
   position: relative;
   display: flex;
@@ -292,18 +357,16 @@ section {
     gap: 1em;
   }
 
-  #place-ships-btn {
-    width: 100px;
-    align-self: center;
-    justify-self: center;
-  }
-
   .ship-tracker {
     display: flex;
     gap: 0.7em;
     flex-wrap: wrap;
-    width: 300px;
+    width: 100%;
     align-self: center;
+
+    list-style: none;
+    padding: 0;
+    margin: 0;
 
     @media (min-width: 600px) {
       flex-direction: column;
@@ -311,34 +374,42 @@ section {
       width: min-content;
       align-self: end;
     }
-  }
-}
 
-footer {
-  display: flex;
-  padding-block: 2em;
-  justify-content: center;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-
-  li {
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.1em;
-
-    .sq-ctn {
+    li {
+      padding: 0;
       display: flex;
+      flex-direction: column;
+      gap: 0.1em;
+      width: min-width;
+      font-size: 0.9em;
 
-      .sq {
-        display: block;
-        width: 20px;
-        height: 20px;
-        border: 1px solid $table-outline;
+      .sq-ctn {
+        display: flex;
+
+        &.vertical {
+          flex-direction: column;
+          width: min-content;
+        }
+
+        &.draggable {
+          cursor: move;
+          cursor: grab;
+
+          &:active {
+            cursor: grabbing;
+          }
+
+          .sq {
+            background-color: white;
+          }
+        }
+
+        .sq {
+          display: block;
+          width: 20px;
+          height: 20px;
+          border: 1px solid $table-outline;
+        }
       }
     }
   }
@@ -354,6 +425,12 @@ ul {
   &.hit {
     background-color: $purple;
   }
+}
+
+footer {
+  display: flex;
+  padding-block: 2em;
+  justify-content: center;
 }
 
 // pop up when someone wins

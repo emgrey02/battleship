@@ -38,11 +38,36 @@
             <button>Play Again</button>
           </div>
         </div>
+        <div id="pregame-instructions">
+          <div>
+            <h3>assemble your fleet!</h2>
+            <p id="instructions">randomize your ship placement or place them yourself</p>
+            <div class="radio-ctn">
+              
+              <label for="random">
+                <input type="radio" id="random" value="random" name="ship-placement" checked>
+                <span class="radio-text">random</span>
+              </label>
+              
+              <label for="manual">
+                <input type="radio" id="manual" value="manual" name="ship-placement">
+                <span class="radio-text">manual</span>
+              </label>
+            </div>
+          </div>
+          <div id="manual-btns" class="remove">
+            <button id="axis-btn">change ship axis</button>
+            <button id="reset-btn">reset current ship placement</button>
+            <button id="next-ship-btn">place next ship</button>
+          </div>
+          <div id="random-btns">
+            <button id="randomize-btn">randomize</button>
+          </div>
+        </div>
         <section id="player-board">
           <div>
             <div class="you-ctn">
               <h2 id="you">your fleet</h2>
-              <button id="place-ships-btn">Place Ships</button>
             </div>
             <div class="p1 battleship-ctn"></div>
           </div>

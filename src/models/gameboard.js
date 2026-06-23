@@ -18,113 +18,91 @@ export const Gameboard = () => {
         board[rowNum][colNum] = null;
       });
     });
+    missedShots = [];
   };
 
-  const getRandomCoords = (length, board) => {
-    let optionsArray = [];
+  const checkDirection = (dir, loc = { x: 0, y: 0 }, length) => {
+    let validCells = [];
 
-    const checkDirection = (dir, loc = { x: 0, y: 0 }, length) => {
-      let validCells = [];
-
-      switch (dir) {
-        case "left":
-          if (loc.y >= length - 1) {
-            for (let i = 0; i < length; i++) {
-              if (!board[loc.x][loc.y - i]) {
-                const coord = { x: loc.x, y: loc.y - i };
-                if (checkSurroundingCells(board, coord)) {
-                  validCells.push(coord);
-                } else {
-                  return false;
-                }
+    switch (dir) {
+      case "left":
+        if (loc.y >= length - 1) {
+          for (let i = 0; i < length; i++) {
+            if (!board[loc.x][loc.y - i]) {
+              const coord = { x: loc.x, y: loc.y - i };
+              if (checkSurroundingCells(coord)) {
+                validCells.push(coord);
               } else {
                 return false;
               }
+            } else {
+              return false;
             }
-            return validCells;
           }
-          return false;
-          break;
-        case "right":
-          if (loc.y <= 9 - (length - 1)) {
-            for (let i = 0; i < length; i++) {
-              if (!board[loc.x][loc.y + i]) {
-                const coord = { x: loc.x, y: loc.y + i };
-                if (checkSurroundingCells(board, coord)) {
-                  validCells.push(coord);
-                } else {
-                  return false;
-                }
-              } else {
-                return false;
-              }
-            }
-            return validCells;
-          }
-          return false;
-          break;
-        case "up":
-          if (loc.x >= length - 1) {
-            for (let i = 0; i < length; i++) {
-              if (!board[loc.x - i][loc.y]) {
-                const coord = { x: loc.x - i, y: loc.y };
-                if (checkSurroundingCells(board, coord)) {
-                  validCells.push(coord);
-                } else {
-                  return false;
-                }
-              } else {
-                return false;
-              }
-            }
-            return validCells;
-          }
-          return false;
-          break;
-        case "down":
-          if (loc.x <= 9 - (length - 1)) {
-            for (let i = 0; i < length; i++) {
-              if (!board[loc.x + i][loc.y]) {
-                const coord = { x: loc.x + i, y: loc.y };
-                if (checkSurroundingCells(board, coord)) {
-                  validCells.push(coord);
-                } else {
-                  return false;
-                }
-              } else {
-                return false;
-              }
-            }
-            return validCells;
-          }
-          return false;
-          break;
-        default:
-          break;
-      }
-    };
-
-    board.forEach((row, rowNum) => {
-      row.forEach((cell, cellNum) => {
-        if (cell == null) {
-          // its a possibility, check directions starting from that cell
-          const currLoc = { x: rowNum, y: cellNum };
-          let leftRes = checkDirection("left", currLoc, length);
-          leftRes && optionsArray.push(leftRes);
-          let rightRes = checkDirection("right", currLoc, length);
-          rightRes && optionsArray.push(rightRes);
-          let upRes = checkDirection("up", currLoc, length);
-          upRes && optionsArray.push(upRes);
-          let downRes = checkDirection("down", currLoc, length);
-          downRes && optionsArray.push(downRes);
+          return validCells;
         }
-      });
-    });
-    //console.log(optionsArray);
-    return optionsArray[Math.floor(Math.random() * optionsArray.length)];
+        return false;
+        break;
+      case "right":
+        if (loc.y <= 9 - (length - 1)) {
+          for (let i = 0; i < length; i++) {
+            if (!board[loc.x][loc.y + i]) {
+              const coord = { x: loc.x, y: loc.y + i };
+              if (checkSurroundingCells(coord)) {
+                validCells.push(coord);
+              } else {
+                return false;
+              }
+            } else {
+              return false;
+            }
+          }
+          return validCells;
+        }
+        return false;
+        break;
+      case "up":
+        if (loc.x >= length - 1) {
+          for (let i = 0; i < length; i++) {
+            if (!board[loc.x - i][loc.y]) {
+              const coord = { x: loc.x - i, y: loc.y };
+              if (checkSurroundingCells(coord)) {
+                validCells.push(coord);
+              } else {
+                return false;
+              }
+            } else {
+              return false;
+            }
+          }
+          return validCells;
+        }
+        return false;
+        break;
+      case "down":
+        if (loc.x <= 9 - (length - 1)) {
+          for (let i = 0; i < length; i++) {
+            if (!board[loc.x + i][loc.y]) {
+              const coord = { x: loc.x + i, y: loc.y };
+              if (checkSurroundingCells(coord)) {
+                validCells.push(coord);
+              } else {
+                return false;
+              }
+            } else {
+              return false;
+            }
+          }
+          return validCells;
+        }
+        return false;
+        break;
+      default:
+        break;
+    }
   };
 
-  const checkSurroundingCells = (board, coord) => {
+  const checkSurroundingCells = (coord) => {
     let validMatrix = [
       [false, false, false],
       [false, true, false],
@@ -227,14 +205,73 @@ export const Gameboard = () => {
     return true;
   };
 
+  const getRandomCoords = (length, board) => {
+    let optionsArray = [];
+
+    board.forEach((row, rowNum) => {
+      row.forEach((cell, cellNum) => {
+        if (cell == null) {
+          // its a possibility, check directions starting from that cell
+          const currLoc = { x: rowNum, y: cellNum };
+          let leftRes = checkDirection("left", currLoc, length);
+          leftRes && optionsArray.push(leftRes);
+          let rightRes = checkDirection("right", currLoc, length);
+          rightRes && optionsArray.push(rightRes);
+          let upRes = checkDirection("up", currLoc, length);
+          upRes && optionsArray.push(upRes);
+          let downRes = checkDirection("down", currLoc, length);
+          downRes && optionsArray.push(downRes);
+        }
+      });
+    });
+    //console.log(optionsArray);
+    return optionsArray[Math.floor(Math.random() * optionsArray.length)];
+  };
+
+  const checkCoords = (coordArray) => {
+    console.log(coordArray);
+    let length = coordArray.length;
+
+    let res = coordArray.every((coord) => {
+      let x = coord.x;
+      let y = coord.y;
+      if (x >= 0 && x <= 9 && y >= 0 && y <= 9) {
+        if (!board[x][y]) {
+          return checkSurroundingCells(coord);
+        }
+      }
+      return false;
+    });
+
+    console.log(res);
+    return res;
+  };
+
   const placeShip = (ship, coordArr = null) => {
     if (!coordArr) {
+      console.log("randomly placing ship");
       coordArr = getRandomCoords(ship.length, board);
+      ship.location = coordArr;
+      coordArr.forEach((coord) => {
+        board[coord.x][coord.y] = ship;
+      });
+    } else if (checkCoords(coordArr)) {
+      console.log("placing ship");
+      ship.location = coordArr;
+      coordArr.forEach((coord) => {
+        board[coord.x][coord.y] = ship;
+      });
+    } else {
+      return false;
     }
-    ship.location = coordArr;
-    coordArr.forEach((coord) => {
-      board[coord.x][coord.y] = ship;
+  };
+
+  const removeShip = (ship) => {
+    console.log(`removing ${ship.name}`);
+    ship.location.forEach((coord) => {
+      board[coord.x][coord.y] = null;
     });
+    ship.location = Array(length).fill(null);
   };
 
   // coords object is { x: num, y: num }
@@ -263,5 +300,7 @@ export const Gameboard = () => {
     receiveAttack,
     checkSunkShips,
     eraseBoard,
+    checkCoords,
+    removeShip,
   };
 };

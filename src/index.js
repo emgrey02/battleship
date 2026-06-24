@@ -3,6 +3,13 @@ import { Player } from "./models/player.js";
 import { Ship } from "./models/ship.js";
 import { Gameboard } from "./models/gameboard.js";
 import { DOMManager } from "./ui-renderer.js";
+import { polyfill } from "mobile-drag-drop";
+import { scrollBehaviourDragImageTranslateOverride } from "mobile-drag-drop/scroll-behaviour.js";
+
+polyfill({
+  // use this to make use of the scroll behaviour
+  dragImageTranslateOverride: scrollBehaviourDragImageTranslateOverride,
+});
 
 const Controller = (() => {
   let _playerTurn;
@@ -35,6 +42,9 @@ const Controller = (() => {
 
     let random = document.querySelector("#random");
     let manual = document.querySelector("#manual");
+
+    let xAxis = document.querySelector("#x-axis");
+    let yAxis = document.querySelector("#y-axis");
 
     let randomBtns = document.querySelector("#random-btns");
     let manualBtns = document.querySelector("#manual-btns");
@@ -69,6 +79,22 @@ const Controller = (() => {
       onManualPlacement(shipNum);
     }
 
+    setAxis("x");
+
+    xAxis.addEventListener("change", (e) => {
+      if (xAxis.checked) {
+        setAxis(xAxis.value);
+        DOMManager.changeShipTrackerAxis(xAxis.value);
+      }
+    });
+
+    yAxis.addEventListener("change", () => {
+      if (yAxis.checked) {
+        setAxis(yAxis.value);
+        DOMManager.changeShipTrackerAxis(yAxis.value);
+      }
+    });
+
     random.addEventListener("change", (e) => {
       if (random.checked) {
         instructions.textContent =
@@ -79,7 +105,8 @@ const Controller = (() => {
         DOMManager.hideStartBtn();
         DOMManager.removeShipTrackerHighlights();
         DOMManager.addShipTrackerLabels();
-        DOMManager.changeToXAxis();
+        DOMManager.changeShipTrackerAxis("x");
+        setAxis("x");
         DOMManager.showShipsInTracker();
       }
     });
@@ -139,17 +166,19 @@ const Controller = (() => {
 
   const startGame = () => {
     DOMManager.pregameSetup();
-
     setUpPregameListeners();
-
-    DOMManager.onChangeAxis(switchAxis);
   };
 
-  const switchAxis = () => {
-    if (axis === "x") {
-      axis = "y";
-    } else {
+  const setAxis = (a) => {
+    let xAxis = document.querySelector("#x-axis");
+    let yAxis = document.querySelector("#y-axis");
+
+    if (a === "x") {
       axis = "x";
+      xAxis.checked = true;
+    } else {
+      axis = "y";
+      yAxis.checked = true;
     }
   };
 
@@ -177,6 +206,7 @@ const Controller = (() => {
     };
     let shipLength = currentShip.length;
     let cellArray = [];
+    console.log(axis);
     for (let i = 0; i < shipLength; i++) {
       if (axis === "x") {
         cellArray.push({ x: cellLoc.x, y: cellLoc.y + i });
@@ -250,6 +280,10 @@ const Controller = (() => {
     }
   };
 
+  const onDragEnter = (e) => {
+    e.preventDefault();
+  };
+
   const resetShip = () => {
     let currentShip = _p1.gameboard.ships[shipNum];
 
@@ -297,6 +331,7 @@ const Controller = (() => {
   const listenForDragEvents = () => {
     let dropTarget = document.querySelector(`.p1 .battleship-table`);
 
+    dropTarget.addEventListener("dragenter", onDragEnter);
     dropTarget.addEventListener("dragover", onDragOver);
     dropTarget.addEventListener("dragleave", onDragLeave);
     dropTarget.addEventListener("drop", onDrop);
@@ -305,6 +340,7 @@ const Controller = (() => {
   const removeDragEventListeners = () => {
     let dropTarget = document.querySelector(`.p1 .battleship-table`);
 
+    dropTarget.removeEventListener("dragenter", onDragEnter);
     dropTarget.removeEventListener("dragover", onDragOver);
     dropTarget.removeEventListener("dragleave", onDragLeave);
     dropTarget.removeEventListener("drop", onDrop);
@@ -323,8 +359,8 @@ const Controller = (() => {
     startTurn();
 
     if (axis === "y") {
-      switchAxis();
-      DOMManager.changeToXAxis();
+      setAxis("x");
+      DOMManager.changeShipTrackerAxis("x");
     }
   };
 
@@ -341,13 +377,29 @@ const Controller = (() => {
     }
   };
 
+  const listenForAttack = () => {
+    const cells = document.querySelectorAll(`.p2 .battleship-table__cell`);
+    cells.forEach((cell) => {
+      cell.addEventListener("click", startPlayerAttack);
+      cell.addEventListener("keydown", startPlayerAttack);
+    });
+  };
+
+  const stopListeningForAttack = () => {
+    const cells = document.querySelectorAll(`.p2 .battleship-table__cell`);
+    cells.forEach((cell) => {
+      cell.removeEventListener("click", startPlayerAttack);
+      cell.removeEventListener("keydown", startPlayerAttack);
+    });
+  };
+
   const startTurn = async () => {
     if (_playerTurn == _p1) {
       DOMManager.setCurrentTurn(_p1);
-      DOMManager.listenForAttack(startPlayerAttack);
+      listenForAttack();
     } else {
       DOMManager.setCurrentTurn(_p2);
-      DOMManager.stopListeningForAttack(startPlayerAttack);
+      stopListeningForAttack();
       setTimeout(() => startComputerAttack(), 500);
     }
   };
@@ -589,7 +641,7 @@ const Controller = (() => {
     });
 
     DOMManager.setCurrentTurn(null);
-    DOMManager.stopListeningForAttack(startPlayerAttack);
+    stopListeningForAttack();
     _playerTurn = null;
   };
 

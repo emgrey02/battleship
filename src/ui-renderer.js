@@ -154,26 +154,14 @@ export const DOMManager = (() => {
     });
   };
 
-  const changeToXAxis = () => {
+  const changeShipTrackerAxis = (axis) => {
     let draggableShips = document.querySelectorAll(`.p1.ship-tracker .sq-ctn`);
     draggableShips.forEach((ship) => {
-      ship.classList.remove("vertical");
-    });
-  };
-
-  const onChangeAxis = (handler) => {
-    let axisBtn = document.querySelector("#axis-btn");
-    axisBtn.addEventListener("click", () => {
-      console.log("axis btn clicked");
-      let draggableShips = document.querySelectorAll(
-        `.p1.ship-tracker .sq-ctn`,
-      );
-      draggableShips.forEach((ship) => {
-        console.log(ship.classList);
-        console.log("toggling");
-        ship.classList.toggle("vertical");
-      });
-      handler();
+      if (axis === "x") {
+        ship.classList.remove("vertical");
+      } else {
+        ship.classList.add("vertical");
+      }
     });
   };
 
@@ -250,22 +238,6 @@ export const DOMManager = (() => {
     }
   };
 
-  const listenForAttack = (handler) => {
-    const cells = document.querySelectorAll(`.p2 .battleship-table__cell`);
-    cells.forEach((cell) => {
-      cell.addEventListener("click", (e) => handler(e));
-      cell.addEventListener("keydown", (e) => handler(e));
-    });
-  };
-
-  const stopListeningForAttack = (handler) => {
-    const cells = document.querySelectorAll(`.p2 .battleship-table__cell`);
-    cells.forEach((cell) => {
-      cell.removeEventListener("click", handler);
-      cell.removeEventListener("keydown", handler);
-    });
-  };
-
   const showRealPlayerBoard = (player) => {
     player.gameboard.board.forEach((row) => {
       console.log(row);
@@ -297,15 +269,12 @@ export const DOMManager = (() => {
     sinkShip,
     isAttackValid,
     clearBoard,
-    listenForAttack,
-    stopListeningForAttack,
     showRealPlayerBoard,
     highlightShip,
     showStartBtn,
     hideStartBtn,
     removeDragoverHighlight,
-    onChangeAxis,
-    changeToXAxis,
+    changeShipTrackerAxis,
     removeShipTrackerHighlights,
     addShipTrackerLabels,
     removeShipTrackerLabels,

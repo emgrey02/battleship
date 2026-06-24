@@ -41,6 +41,7 @@ main {
   flex-direction: column;
   gap: 1rem;
   align-items: center;
+  position: relative;
 
   @media (min-width: 1000px) {
     flex-direction: row;
@@ -57,6 +58,16 @@ main {
   justify-content: center;
   gap: 1em;
   width: 100%;
+
+  @media (min-width: 1100px) {
+    position: fixed;
+    top: 300px;
+    justify-content: start;
+    width: 250px;
+    align-self: start;
+    border-right: 1px solid $table-outline;
+    z-index: 2;
+  }
 
   &.remove {
     display: none;
@@ -95,8 +106,8 @@ main {
       display: flex;
       width: 100%;
       position: relative;
-      border-top: 1px solid $table-outline;
-      border-bottom: 1px solid $table-outline;
+      border: 1px solid $table-outline;
+      border-radius: 0.5em;
       margin-block-start: 0.7em;
 
       label {
@@ -125,9 +136,8 @@ main {
           left: 0;
           width: 100%;
           height: 100%;
-          background-color: black;
-          border-left: 2px solid $purple;
-          border-right: 2px solid $purple;
+          box-shadow: 0 0 0 50px $main-blue inset;
+          border-radius: 0.5em;
           z-index: -1;
         }
       }
@@ -135,12 +145,60 @@ main {
   }
 }
 
+.sm-radio-ctn {
+  display: flex;
+  position: absolute;
+  right: 20px;
+  bottom: 16px;
+  border: 1px solid $table-outline;
+  border-radius: 0.5em;
+
+  @media (min-width: 600px) {
+    right: 15px;
+    bottom: -30px;
+  }
+
+  label {
+    position: relative;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  span.radio-text {
+    display: block;
+    padding-inline: 1em;
+    margin-block-start: -15px;
+    width: max-content;
+    padding-block-end: 5px;
+    text-align: center;
+    z-index: 0;
+  }
+
+  input {
+    appearance: none;
+
+    &:checked + span::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      box-shadow: 0 0 0 50px $main-blue inset;
+      border-radius: 0.5em;
+      z-index: -1;
+    }
+  }
+}
+
 #manual-btns {
   display: flex;
   align-self: center;
-  justify-content: space-between;
-  width: 320px;
-  margin-inline-start: 1.9em;
+  top: 0;
+  right: 0;
+  width: 200px;
   gap: 0.7em;
 
   @media (min-width: 1200px) {
@@ -151,14 +209,73 @@ main {
   &.remove {
     display: none;
   }
+
+  #reset-btn {
+    padding-block: 0;
+    padding-block-end: -5px;
+    position: absolute;
+    top: 0;
+    right: 100px;
+    svg {
+      width: 30px;
+      height: 30px;
+      path {
+        fill: $body-text;
+      }
+    }
+  }
+
+  #next-ship-btn {
+    padding-block: 0;
+    padding-block-end: -5px;
+    position: absolute;
+    top: 0;
+    right: 20px;
+    background-color: green;
+    svg {
+      width: 30px;
+      height: 30px;
+      path {
+        fill: $body-text;
+      }
+    }
+    &:hover {
+      background-color: $main-blue;
+      border-radius: 1em;
+    }
+
+    &:active {
+      background-color: $header-text;
+    }
+
+    &:focus {
+      outline: 2px solid $body-text;
+    }
+
+    &:disabled {
+      background-color: grey;
+      cursor: auto;
+      &:hover {
+        background-color: grey;
+        border-radius: 0.2em;
+      }
+    }
+  }
+
+  #reset-btn,
+  #next-ship-btn {
+    @media (min-width: 600px) {
+      top: 30px;
+    }
+  }
 }
 
 #random-btns {
   position: absolute;
   width: min-content;
-  top: 30%;
-  right: 30%;
-  transform: translate(-30%, -30%);
+  top: 0;
+  right: 0;
+  margin-inline-end: 1em;
 }
 
 .battleship-table {
@@ -406,13 +523,13 @@ section {
   position: relative;
   display: grid;
   grid-template-columns: auto;
-  grid-template-rows: auto 1fr 1fr;
+  grid-template-rows: auto 1fr;
   flex-direction: column;
   gap: 0.2em;
 
   @media (min-width: 600px) {
     grid-template-columns: auto 1fr;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto;
   }
 
   .ship-tracker {
@@ -430,6 +547,7 @@ section {
     padding-inline: 0;
     padding-block: 1em;
     width: 320px;
+    height: 140px;
 
     @media (min-width: 600px) {
       flex-direction: column;

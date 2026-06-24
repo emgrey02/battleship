@@ -47,6 +47,12 @@ test("board is properly erased", () => {
   expect(gameboard.board[0][0]).toBeNull();
 });
 
+test("missedShots stays in sync after eraseBoard", () => {
+  gameboard.eraseBoard();
+  gameboard.receiveAttack({ x: 2, y: 2 });
+  expect(gameboard.missedShots).toEqual([{ x: 2, y: 2 }]);
+});
+
 test("check that every ship is sunk", () => {
   gameboard.ships.forEach((ship) => {
     gameboard.placeShip(ship);

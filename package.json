@@ -13,7 +13,7 @@
   "license": "ISC",
   "author": "Emma Grey",
   "type": "module",
-  "main": "app.js",
+  "main": "babel.config.js",
   "scripts": {
     "start": "webpack serve",
     "build": "webpack --mode=development",

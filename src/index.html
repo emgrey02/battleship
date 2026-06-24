@@ -15,14 +15,28 @@
   <body>
     <header>
       <h1>battleship</h1>
-      <!-- <div id="scrollable-content" tabindex="0">
-        <p>
-          Press the "Place Ships" button to randomly place your ships. Keep
-          pressing until you are happy with your ship placements.
-        </p>
-      </div> -->
     </header>
     <main>
+      <div id="pregame-instructions">
+          <div class="main-controls-ctn">
+            <div class="text-ctn">
+              <h3>assemble your fleet!</h2>
+              <p id="instructions">randomize your ship placement or place them yourself</p>
+            </div>
+            <div class="radio-ctn">
+              <label for="random">
+                <input type="radio" id="random" value="random" name="ship-placement" checked>
+                <span class="radio-text">random</span>
+              </label>
+              
+              <label for="manual">
+                <input type="radio" id="manual" value="manual" name="ship-placement">
+                <span class="radio-text">manual</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <button id="start-game">Start Game</button>
       <div class="main-ctn">
         <div id="pop-up" class="remove">
           <div id="pop-up-content">
@@ -38,32 +52,6 @@
             <button>Play Again</button>
           </div>
         </div>
-        <div id="pregame-instructions">
-          <div>
-            <h3>assemble your fleet!</h2>
-            <p id="instructions">randomize your ship placement or place them yourself</p>
-            <div class="radio-ctn">
-              
-              <label for="random">
-                <input type="radio" id="random" value="random" name="ship-placement" checked>
-                <span class="radio-text">random</span>
-              </label>
-              
-              <label for="manual">
-                <input type="radio" id="manual" value="manual" name="ship-placement">
-                <span class="radio-text">manual</span>
-              </label>
-            </div>
-          </div>
-          <div id="manual-btns" class="remove">
-            <button id="axis-btn">change ship axis</button>
-            <button id="reset-btn">reset current ship placement</button>
-            <button id="next-ship-btn">place next ship</button>
-          </div>
-          <div id="random-btns">
-            <button id="randomize-btn">randomize</button>
-          </div>
-        </div>
         <section id="player-board">
           <div>
             <div class="you-ctn">
@@ -73,7 +61,7 @@
           </div>
           <ul class="p1 ship-tracker">
             <li>
-              carrier
+              <span data-name="carrier">carrier</span>
               <div class="sq-ctn carrier">
                 <span class="sq"></span>
                 <span class="sq"></span>
@@ -83,7 +71,7 @@
               </div>
             </li>
             <li>
-              battleship
+              <span data-name="battleship">battleship</span>
               <div class="sq-ctn battleship">
                 <span class="sq"></span>
                 <span class="sq"></span>
@@ -92,7 +80,7 @@
               </div>
             </li>
             <li>
-              destroyer
+              <span data-name="destroyer">destroyer</span>
               <div class="sq-ctn destroyer">
                 <span class="sq"></span>
                 <span class="sq"></span>
@@ -100,7 +88,7 @@
               </div>
             </li>
             <li>
-              submarine
+              <span data-name="submarine">submarine</span>
               <div class="sq-ctn submarine">
                 <span class="sq"></span>
                 <span class="sq"></span>
@@ -108,13 +96,23 @@
               </div>
             </li>
             <li>
-              patrol boat
+              <span data-name="patrol boat">patrol boat</span>
               <div class="sq-ctn patrol-boat">
                 <span class="sq"></span>
                 <span class="sq"></span>
               </div>
             </li>
           </ul>
+          <div id="manual-btns" class="remove">
+            <div>
+              <button id="axis-btn">change ship axis</button>
+            </div>
+            <button id="reset-btn">reset ship</button>
+            <button id="next-ship-btn">lock-in</button>
+          </div>
+          <div id="random-btns">
+            <button id="randomize-btn">randomize</button>
+          </div>
         </section>
         <section id="computer-board" class="remove">
           <div>
@@ -167,7 +165,6 @@
           </ul>
         </section>
       </div>
-      <button id="start-game">Start Game</button>
     </main>
     <footer>&copy; Emma Grey</footer>
   </body>

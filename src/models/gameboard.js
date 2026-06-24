@@ -228,8 +228,9 @@ export const Gameboard = () => {
     return optionsArray[Math.floor(Math.random() * optionsArray.length)];
   };
 
+  // checks whether an array of coordinates can be placed on the board
+  // cells cant already be occupied as well as surrounding cells
   const checkCoords = (coordArray) => {
-    console.log(coordArray);
     let length = coordArray.length;
 
     let res = coordArray.every((coord) => {
@@ -256,7 +257,7 @@ export const Gameboard = () => {
         board[coord.x][coord.y] = ship;
       });
     } else if (checkCoords(coordArr)) {
-      console.log("placing ship");
+      console.log("placing ship manually");
       ship.location = coordArr;
       coordArr.forEach((coord) => {
         board[coord.x][coord.y] = ship;
@@ -295,7 +296,9 @@ export const Gameboard = () => {
   return {
     ships,
     board,
-    missedShots,
+    get missedShots() {
+      return missedShots;
+    },
     placeShip,
     receiveAttack,
     checkSunkShips,

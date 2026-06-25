@@ -224,7 +224,6 @@ export const Gameboard = () => {
         }
       });
     });
-    //console.log(optionsArray);
     return optionsArray[Math.floor(Math.random() * optionsArray.length)];
   };
 
@@ -244,20 +243,19 @@ export const Gameboard = () => {
       return false;
     });
 
-    console.log(res);
     return res;
   };
 
   const placeShip = (ship, coordArr = null) => {
     if (!coordArr) {
-      console.log("randomly placing ship");
+      // randomly place ship
       coordArr = getRandomCoords(ship.length, board);
       ship.location = coordArr;
       coordArr.forEach((coord) => {
         board[coord.x][coord.y] = ship;
       });
     } else if (checkCoords(coordArr)) {
-      console.log("placing ship manually");
+      // manually place ship
       ship.location = coordArr;
       coordArr.forEach((coord) => {
         board[coord.x][coord.y] = ship;
@@ -268,7 +266,6 @@ export const Gameboard = () => {
   };
 
   const removeShip = (ship) => {
-    console.log(`removing ${ship.name}`);
     ship.location.forEach((coord) => {
       board[coord.x][coord.y] = null;
     });

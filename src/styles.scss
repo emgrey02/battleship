@@ -23,7 +23,7 @@ body {
   font-family: "Ubuntu", sans-serif;
   font-weight: 300;
   font-style: normal;
-  background: url("./assets/layered-waves-haikei.svg");
+  background: url("./assets/low-poly-grid-haikei.svg");
   background-color: $bkgd;
   background-size: cover;
 }
@@ -33,6 +33,9 @@ main {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background-color: rgba(0, 0, 0, 0.671);
+  padding-block: 3em;
+  z-index: 1;
 }
 
 .main-ctn {
@@ -59,9 +62,9 @@ main {
   gap: 1em;
   width: 100%;
 
-  @media (min-width: 1100px) {
+  @media (min-width: 1200px) {
     position: fixed;
-    top: 300px;
+    top: 380px;
     justify-content: start;
     width: 250px;
     align-self: start;
@@ -103,6 +106,7 @@ main {
     }
 
     .radio-ctn {
+      padding: 0;
       display: flex;
       width: 100%;
       position: relative;
@@ -121,6 +125,7 @@ main {
       span.radio-text {
         display: block;
         padding-inline: 1em;
+        margin-block-start: -5px;
         padding-block-end: 1em;
         text-align: center;
         z-index: 0;
@@ -145,7 +150,15 @@ main {
   }
 }
 
+input[type="radio"] {
+  &:focus + span::before {
+    outline: 2px solid white;
+    border-radius: 0.2em;
+  }
+}
+
 .sm-radio-ctn {
+  padding: 0;
   display: flex;
   position: absolute;
   right: 20px;
@@ -273,9 +286,13 @@ main {
 #random-btns {
   position: absolute;
   width: min-content;
-  top: 0;
+  top: 0px;
   right: 0;
   margin-inline-end: 1em;
+
+  @media (min-width: 600px) {
+    top: 30px;
+  }
 }
 
 .battleship-table {
@@ -288,13 +305,13 @@ main {
   }
 
   @media (min-width: 1000px) {
-    width: 350px;
-    height: 350px;
+    width: 320px;
+    height: 320px;
   }
 
   @media (min-width: 1200px) {
-    width: 450px;
-    height: 450px;
+    width: 420px;
+    height: 420px;
   }
   // border: 1px solid $table-outline;
   border-collapse: collapse;
@@ -370,7 +387,7 @@ main {
 
 // mobile layout for player's board
 #player-board.small {
-  @media (max-width: 500px) {
+  @media (max-width: 1000px) {
     display: flex;
     flex-direction: row;
 
@@ -381,6 +398,7 @@ main {
       font-size: 0.7em;
       width: 100px;
       align-self: end;
+      padding-inline-start: 1em;
 
       .sq {
         width: 15px;
@@ -388,14 +406,32 @@ main {
       }
     }
   }
+
   .p1 .battleship-table {
-    @media (max-width: 500px) {
-      width: 140px;
-      height: 140px;
+    width: 140px;
+    height: 140px;
+
+    th {
+      font-size: 0.5em;
+    }
+
+    @media (min-width: 600px) {
+      width: 200px;
+      height: 200px;
+    }
+
+    @media (min-width: 1000px) {
+      width: 320px;
+      height: 320px;
 
       th {
-        font-size: 0.5em;
+        font-size: 1em;
       }
+    }
+
+    @media (min-width: 1200px) {
+      width: 420px;
+      height: 420px;
     }
   }
 }
@@ -414,7 +450,6 @@ header {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5em;
 }
 
 h1 {
@@ -428,13 +463,6 @@ h2 {
   padding-inline-start: 0.5em;
   padding-block-end: 0.4em;
   margin: 0;
-}
-
-// start game button
-#start-game {
-  margin-block: 2em;
-  width: 100px;
-  align-self: center;
 }
 
 .remove {
@@ -471,6 +499,14 @@ button {
   transition:
     border-radius 200ms,
     background-color 200ms;
+
+  &#start-game {
+    margin-block: 1em;
+    width: 150px;
+    padding-block: 1em;
+    background-color: green;
+    align-self: center;
+  }
 
   &:hover {
     background-color: $main-blue;
@@ -560,11 +596,11 @@ section {
     }
 
     @media (min-width: 1000px) {
-      height: 318px;
+      height: 290px;
     }
 
     @media (min-width: 1200px) {
-      height: 408px;
+      height: 380px;
     }
 
     li {

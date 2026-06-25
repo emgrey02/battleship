@@ -37,49 +37,29 @@ const Controller = (() => {
   let shipNum = 0;
 
   const setUpPregameListeners = () => {
-    let pregameInstructions = document.querySelector("#pregame-instructions");
-    let instructions = document.querySelector("#instructions");
-
     let random = document.querySelector("#random");
     let manual = document.querySelector("#manual");
 
     let xAxis = document.querySelector("#x-axis");
     let yAxis = document.querySelector("#y-axis");
 
-    let randomBtns = document.querySelector("#random-btns");
-    let manualBtns = document.querySelector("#manual-btns");
-
     let randomizeBtn = document.querySelector("#randomize-btn");
-
     let startBtn = document.querySelector("#start-game");
+    let lockShipBtn = document.querySelector("#next-ship-btn");
 
-    let computerBoard = document.querySelector("#computer-board");
-    let playerBoard = document.querySelector("#player-board");
-
-    let nextShipBtn = document.querySelector("#next-ship-btn");
-
-    startBtn.classList.add("hide");
-    nextShipBtn.disabled = true;
+    DOMManager.hideStartBtn();
+    lockShipBtn.disabled = true;
+    setAxis("x");
 
     if (random.checked) {
-      // tell ui renderer to do this
-      instructions.textContent =
-        "keep randomizing until you are satisfied with your ship placements.";
-      randomBtns.classList.remove("remove");
-      manualBtns.classList.add("remove");
+      DOMManager.onRandomMode();
       DOMManager.addShipTrackerLabels();
       eraseBoard(_p1);
     } else {
-      // tell ui renderer to do this
-      instructions.textContent =
-        "click and drag the highlighted ship to your board.";
-      randomBtns.classList.add("remove");
-      manualBtns.classList.remove("remove");
+      DOMManager.onManualMode();
       DOMManager.removeShipTrackerLabels();
-      onManualPlacement(shipNum);
+      onManualPlacement();
     }
-
-    setAxis("x");
 
     xAxis.addEventListener("change", (e) => {
       if (xAxis.checked) {
@@ -97,16 +77,13 @@ const Controller = (() => {
 
     random.addEventListener("change", (e) => {
       if (random.checked) {
-        instructions.textContent =
-          "keep randomizing until you are satisfied with your ship placements.";
-        randomBtns.classList.remove("remove");
-        manualBtns.classList.add("remove");
         eraseBoard(_p1);
+        setAxis("x");
+        DOMManager.onRandomMode();
         DOMManager.hideStartBtn();
         DOMManager.removeShipTrackerHighlights();
         DOMManager.addShipTrackerLabels();
         DOMManager.changeShipTrackerAxis("x");
-        setAxis("x");
         DOMManager.showShipsInTracker();
       }
     });
@@ -118,36 +95,29 @@ const Controller = (() => {
 
     manual.addEventListener("change", () => {
       if (manual.checked) {
-        randomBtns.classList.add("remove");
-        manualBtns.classList.remove("remove");
-        startBtn.classList.add("hide");
-        instructions.textContent =
-          "click and drag the highlighted ship to your board.";
+        // switch to manual placement mode
         shipNum = 0;
-        nextShipBtn.disabled = true;
+        lockShipBtn.disabled = true;
+
+        DOMManager.onManualMode();
         DOMManager.removeShipTrackerLabels();
+        DOMManager.hideStartBtn();
         DOMManager.showShipsInTracker();
         onManualPlacement();
       }
     });
 
     startBtn.addEventListener("click", () => {
-      randomizeBtn.classList.add("remove");
-      computerBoard.classList.remove("remove");
-      playerBoard.classList.add("small");
-      startBtn.classList.add("remove");
-      pregameInstructions.classList.add("remove");
-      manualBtns.classList.add("remove");
-      randomBtns.classList.add("remove");
-
+      DOMManager.onStartGame();
       DOMManager.removeShipTrackerHighlights();
       DOMManager.addShipTrackerLabels();
       DOMManager.showShipsInTracker();
       onStartBtnClicked();
     });
 
-    nextShipBtn.addEventListener("click", (e) => {
+    lockShipBtn.addEventListener("click", (e) => {
       DOMManager.removeShipFromTracker(shipNum);
+
       let cellArray = _p1.gameboard.ships[shipNum].location;
       DOMManager.removeDragoverHighlight(cellArray);
 
@@ -155,12 +125,13 @@ const Controller = (() => {
       if (shipNum < 5) {
         onManualPlacement();
       } else {
+        // disable reset ship btn after last ship is locked in & show start btn
         let resetShipBtn = document.querySelector("#reset-btn");
         resetShipBtn.disabled = true;
         DOMManager.showStartBtn();
       }
 
-      nextShipBtn.disabled = true;
+      lockShipBtn.disabled = true;
     });
   };
 
@@ -206,7 +177,6 @@ const Controller = (() => {
     };
     let shipLength = currentShip.length;
     let cellArray = [];
-    console.log(axis);
     for (let i = 0; i < shipLength; i++) {
       if (axis === "x") {
         cellArray.push({ x: cellLoc.x, y: cellLoc.y + i });
@@ -253,7 +223,7 @@ const Controller = (() => {
 
   const onDrop = (e) => {
     let resetShipBtn = document.querySelector("#reset-btn");
-    let nextShipBtn = document.querySelector("#next-ship-btn");
+    let lockShipBtn = document.querySelector("#next-ship-btn");
     let currentShip = _p1.gameboard.ships[shipNum];
 
     let cellLoc = {
@@ -271,10 +241,9 @@ const Controller = (() => {
     }
 
     if (_p1.gameboard.checkCoords(cellArray)) {
-      console.log("placing ship");
       _p1.gameboard.placeShip(currentShip, cellArray);
       DOMManager.showShipInTable("real", cellArray);
-      nextShipBtn.disabled = false;
+      lockShipBtn.disabled = false;
       resetShipBtn.disabled = false;
       removeDragEventListeners();
     }
@@ -296,9 +265,9 @@ const Controller = (() => {
       DOMManager.hideStartBtn();
     }
 
-    // disable placenextship btn
-    let nextShipBtn = document.querySelector("#next-ship-btn");
-    nextShipBtn.disabled = true;
+    // disable lock ship btn
+    let lockShipBtn = document.querySelector("#next-ship-btn");
+    lockShipBtn.disabled = true;
 
     // disable reset btn
     let resetShipBtn = document.querySelector("#reset-btn");
@@ -372,7 +341,6 @@ const Controller = (() => {
 
     // update ui if it's player's board
     if (player.type === "real") {
-      console.log("showing real player board");
       DOMManager.showRealPlayerBoard(_p1);
     }
   };

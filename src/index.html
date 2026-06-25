@@ -23,7 +23,7 @@
             <h3>assemble your fleet!</h2>
             <p id="instructions">randomize your ship placement or place them yourself</p>
           </div>
-          <div class="radio-ctn">
+          <fieldset role="radiogroup" class="radio-ctn">
             <label for="random">
               <input type="radio" id="random" value="random" name="ship-placement" checked>
               <span class="radio-text">random</span>
@@ -33,7 +33,7 @@
               <input type="radio" id="manual" value="manual" name="ship-placement">
               <span class="radio-text">manual</span>
             </label>
-          </div>
+          </fieldset>
         </div>
       </div>
       <button id="start-game">Start Game</button>
@@ -105,7 +105,7 @@
           </ul>
           <div id="manual-btns" class="remove">
             <div>
-              <div class="sm-radio-ctn">
+              <fieldset role="radiogroup" class="sm-radio-ctn">
               <label for="x-axis">
                 <input type="radio" id="x-axis" value="x" name="ship-axis" checked>
                 <span class="radio-text">x-axis</span>
@@ -114,7 +114,7 @@
                 <input type="radio" id="y-axis" value="y" name="ship-axis">
                 <span class="radio-text">y-axis</span>
               </label>
-              </div>
+            </fieldset>
               <!-- <button id="axis-btn">change ship axis</button> -->
             </div>
             <button id="reset-btn">

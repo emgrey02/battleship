@@ -8,7 +8,6 @@ export const DOMManager = (() => {
     let table = document.querySelector(".p2 .battleship-table");
 
     if (!player) {
-      console.log("game over.");
       table.classList.remove("my-turn");
       return;
     }
@@ -35,10 +34,13 @@ export const DOMManager = (() => {
       ctn.forEach((c) => {
         const table = document.createElement("table");
         table.classList.add("battleship-table");
+        table.setAttribute("role", "grid");
+        table.setAttribute("aria-label", "Battleship board");
 
         // create cells in table
         for (let i = 0; i < 11; i++) {
           const tr = table.insertRow();
+          tr.setAttribute("role", "row");
 
           for (let j = 0; j < 11; j++) {
             // first row, create header cells
@@ -46,9 +48,11 @@ export const DOMManager = (() => {
               if (j == 0) {
                 // fist row, first column, empty cell
                 const td = tr.insertCell();
+                td.setAttribute("role", "gridcell");
               } else {
                 const th = document.createElement("th");
                 th.scope = "col";
+                th.setAttribute("role", "columnheader");
                 th.innerText = String.fromCharCode(`${96 + j}`);
                 tr.appendChild(th);
               }
@@ -56,6 +60,7 @@ export const DOMManager = (() => {
               // starting at second row
               const th = document.createElement("th");
               th.scope = "row";
+              th.setAttribute("role", "rowheader");
               th.innerText = i;
               tr.appendChild(th);
             } else {
@@ -121,7 +126,6 @@ export const DOMManager = (() => {
       `.p1.ship-tracker li span[data-name]`,
     );
     ships.forEach((label) => {
-      console.log(label);
       label.style.display = "none";
     });
   };
@@ -131,7 +135,6 @@ export const DOMManager = (() => {
       `.p1.ship-tracker li span[data-name]`,
     );
     ships.forEach((label) => {
-      console.log(label);
       label.style.display = "inline";
     });
   };
@@ -240,14 +243,50 @@ export const DOMManager = (() => {
 
   const showRealPlayerBoard = (player) => {
     player.gameboard.board.forEach((row) => {
-      console.log(row);
       row.forEach((cell) => {
         if (cell !== null) {
-          console.log("show ship in table");
           showShipInTable(player.type, cell.location);
         }
       });
     });
+  };
+
+  const onStartGame = () => {
+    let computerBoard = document.querySelector("#computer-board");
+    let playerBoard = document.querySelector("#player-board");
+    let randomBtns = document.querySelector("#random-btns");
+    let manualBtns = document.querySelector("#manual-btns");
+    let pregameInstructions = document.querySelector("#pregame-instructions");
+    let startBtn = document.querySelector("#start-game");
+
+    computerBoard.classList.remove("remove");
+    playerBoard.classList.add("small");
+    startBtn.classList.add("remove");
+    pregameInstructions.classList.add("remove");
+    manualBtns.classList.add("remove");
+    randomBtns.classList.add("remove");
+  };
+
+  const onRandomMode = () => {
+    let randomBtns = document.querySelector("#random-btns");
+    let manualBtns = document.querySelector("#manual-btns");
+    let instructions = document.querySelector("#instructions");
+
+    instructions.textContent =
+      "keep randomizing until you are satisfied with your ship placements.";
+    randomBtns.classList.remove("remove");
+    manualBtns.classList.add("remove");
+  };
+
+  const onManualMode = () => {
+    let randomBtns = document.querySelector("#random-btns");
+    let manualBtns = document.querySelector("#manual-btns");
+    let instructions = document.querySelector("#instructions");
+
+    instructions.textContent =
+      "click and drag the highlighted ship to your board.";
+    randomBtns.classList.add("remove");
+    manualBtns.classList.remove("remove");
   };
 
   const showStartBtn = () => {
@@ -280,5 +319,8 @@ export const DOMManager = (() => {
     removeShipTrackerLabels,
     removeShipFromTracker,
     showShipsInTracker,
+    onRandomMode,
+    onManualMode,
+    onStartGame,
   };
 })();
